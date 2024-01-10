@@ -23,10 +23,10 @@ Significato dei simboli nelle tabelle:
 """
 #definizioni
 
-COLONNE = 10
-RIGHE = 10
+COLUMNS = 10
+ROWS = 10
 
-NAVI = [2,2,2,2,3,3,3,4,4,5]
+SHIPS = [2,2,2,2,3,3,3,4,4,5]
 #ogni numero corrisponde alla lunghezza di una nave
 
 
@@ -39,71 +39,97 @@ import time
 ################################################################################
 
 
-#gerela la tabella con tutti i valori incogniti
-def crea_tabella(righe, colonne, elementi):
-    tabella = [[elementi for _ in range(colonne)] for _ in range(righe)]
-    return tabella
+def create_table(rows, columns, elements):
+    """
+    Creates a 2D table (list of lists) with the specified number of rows and columns,
+    filling each cell with the provided elements.
 
-#stampa la tabella su seriale
-def stampa_tabella(tabella):
-    for riga in tabella:
-        for elemento in riga:
-            print(elemento, end=" ")
+    Parameters:
+    - rows (int): The number of rows in the table.
+    - columns (int): The number of columns in the table.
+    - elements: The value to be placed in each cell of the table.
+
+    Returns:
+    - list: A 2D table represented as a list of lists.
+    """
+    table = [[elements for _ in range(columns)] for _ in range(rows)]
+    return table
+
+def print_table(table):
+    """
+    Prints the elements of a 2D table in a readable format.
+
+    Parameters:
+    - table (list): A 2D table represented as a list of lists.
+
+    Prints:
+    - Displays the elements of the table, with each row on a new line.
+    """
+    for row in table:
+        for item in row:
+            print(item, end=" ")
         print()
 
-def attacco(tabella_di_attacco, tabella_di_difesa, riga, colonna):
-    riga -= 1
-    colonna -= 1
+def attack(attack_table, ship_positioning_table, row, columns):
+    """
+    Performs an attack on a specified position in the target ship_positioning_table.
 
-    if tabella_di_attacco[riga][colonna] != "O":
-        #queste coordinate sono già state colpite, mossa illegale
-        return 0
-    elif tabella_di_difesa[riga][colonna] == 0:
-        tabella_di_attacco[riga][colonna] = "A"
-    else:
-        tabella_di_attacco[riga][colonna] = "X"
+    Parameters:
+    - attack_table (list): The table representing the state of attacks, where "O" denotes an unattacked position.
+    - ship_positioning_table (list): The table representing the positions of ships, where 0 denotes an empty position.
+    - row (int): The row of the attack position (index of the array = row - 1).
+    - column (int): The column of the attack position (index of the array = column - 1).
 
-    return 1
+    Modifies:
+    - Modifies the attack_table based on the outcome of the attack.
+    """
+    row -= 1
+    columns -= 1
+    if attack_table[row][columns] == "O":
+        if ship_positioning_table[row][columns] == 0:
+            attack_table[row][columns] = "A"
+        else:
+            attack_table[row][columns] = "X"
 
 
-def colpito_e_affondato(tabella_di_attacco, tabella_di_difesa, riga, colonna):
+def check_hit_and_sunk(attack_table, ship_positioning_table, row, columns):
 
-    riga -= 1
-    colonna -= 1
+    row -= 1
+    columns -= 1
 
-    numero_barca = tabella_di_difesa[riga][colonna]
+    ship_number = ship_positioning_table[row][columns]
 
-    if numero_barca == 0:
+    if ship_number == 0:
         return 0
 
     #controlla se ci sono pezzi di barca rimanenti
-    for rig in range(len(tabella_di_difesa)):
-        for col in range(len(tabella_di_difesa[0])):
-            if tabella_di_difesa[rig][col] == numero_barca:
-                if tabella_di_attacco[rig][col] == "O":
+    for r in range(len(ship_positioning_table)):
+        for c in range(len(ship_positioning_table[0])):
+            if ship_positioning_table[r][c] == ship_number:
+                if attack_table[r][c] == "O":
                     return 0
                     #se ci sono fine funzione
 
     #altrimenti continua
     #e cambia tutti i pezzi della barca con il simbolo colpito e affondato
-    for rig in range(len(tabella_di_difesa)):
-        for col in range(len(tabella_di_difesa[0])):
-            if tabella_di_difesa[rig][col] == numero_barca:
-                tabella_di_attacco[rig][col] = "Y"
+    for r in range(len(ship_positioning_table)):
+        for c in range(len(ship_positioning_table[0])):
+            if ship_positioning_table[r][c] == ship_number:
+                attack_table[r][c] = "Y"
 
     return 1
 
 
-def win(tabella_di_attacco, tabella_di_difesa):
+def win(attack_table, ship_positioning_table):
 
     #contiene tutte le parti ancora da colpire
-    tabella_sovrapposizione = crea_tabella(len(tabella_di_attacco), len(tabella_di_attacco[0]), 0)
+    tabella_sovrapposizione = create_table(len(attack_table), len(attack_table[0]), 0)
 
     #confronto le due tabelle
     for rig in range(len(tabella_sovrapposizione)):
         for col in range(len(tabella_sovrapposizione[0])):
-            if tabella_di_attacco[rig][col] == "O":
-                tabella_sovrapposizione[rig][col] = tabella_di_difesa[rig][col]
+            if attack_table[rig][col] == "O":
+                tabella_sovrapposizione[rig][col] = ship_positioning_table[rig][col]
 
     #vedo se ci sono parti mancanti
     for rig in range(len(tabella_sovrapposizione)):
@@ -115,15 +141,15 @@ def win(tabella_di_attacco, tabella_di_difesa):
     return 1 #hai vinto
 
 
-def calcola_navi_rimanenti(tabella_di_attacco, tabella_di_difesa, navi):
+def calcola_navi_rimanenti(attack_table, ship_positioning_table, navi):
     #contiene tutte le parti ancora da colpire
-    tabella_sovrapposizione = crea_tabella(len(tabella_di_attacco), len(tabella_di_attacco[0]), 0)
+    tabella_sovrapposizione = create_table(len(attack_table), len(attack_table[0]), 0)
 
     #confronto le due tabelle
     for rig in range(len(tabella_sovrapposizione)):
         for col in range(len(tabella_sovrapposizione[0])):
-            if tabella_di_attacco[rig][col] == "O":
-                tabella_sovrapposizione[rig][col] = tabella_di_difesa[rig][col]
+            if attack_table[rig][col] == "O":
+                tabella_sovrapposizione[rig][col] = ship_positioning_table[rig][col]
 
     navi_rimanenti=[]
     for nav in range(len(navi)):
@@ -151,7 +177,7 @@ def conta_elemento_in_tabella(tabella, elemento):
 def gioco(tabella_attacco, tabella_difesa):
 
     while True:
-        stampa_tabella(tabella_attacco)
+        print_table(tabella_attacco)
 
         while True:
             try:
@@ -165,8 +191,8 @@ def gioco(tabella_attacco, tabella_difesa):
             break  # Esce dal ciclo while se l'input è valido
 
 
-        attacco(tabella_attacco, tabella_difesa, riga, colonna)
-        colpito_e_affondato(tabella_attacco, tabella_difesa, riga, colonna)
+        attack(tabella_attacco, tabella_difesa, riga, colonna)
+        check_hit_and_sunk(tabella_attacco, tabella_difesa, riga, colonna)
         if win(tabella_attacco, tabella_difesa):
             print("Hai vinto!")
             return
@@ -179,11 +205,11 @@ def gioco_bot(tabella_attacco, tabella_difesa, navi):
     while True:
         conta_mosse += 1
 
-        """stampa_tabella(tabella_attacco)
+        """print_table(tabella_attacco)
         print("")
         print("Mossa numero " + str(conta_mosse))
         print("")
-        #stampa_tabella(tabella_legal_mooves(tabella_attacco))
+        #print_table(tabella_legal_mooves(tabella_attacco))
         #print("")
         #print(lista_legal_mooves(tabella_attacco))
         #print("")
@@ -191,7 +217,7 @@ def gioco_bot(tabella_attacco, tabella_difesa, navi):
         #print("")
         #print(calcola_navi_rimanenti(tabella_attacco, tabella_difesa, navi))
         #print("")
-        stampa_tabella(calcola_tabella_probabilita(tabella_attacco, calcola_navi_rimanenti(tabella_attacco, tabella_difesa, navi)))
+        print_table(calcola_tabella_probabilita(tabella_attacco, calcola_navi_rimanenti(tabella_attacco, tabella_difesa, navi)))
         print("")"""
 
 
@@ -203,8 +229,8 @@ def gioco_bot(tabella_attacco, tabella_difesa, navi):
         #time.sleep(0.05)
 
 
-        attacco(tabella_attacco, tabella_difesa, riga, colonna)
-        colpito_e_affondato(tabella_attacco, tabella_difesa, riga, colonna)
+        attack(tabella_attacco, tabella_difesa, riga, colonna)
+        check_hit_and_sunk(tabella_attacco, tabella_difesa, riga, colonna)
         if win(tabella_attacco, tabella_difesa):
             #print("Hai vinto!")
             return conta_mosse
@@ -387,7 +413,7 @@ def trova_coordinate_massimo(tabella):
     return indice_riga_massimo+1, indice_colonna_massimo+1
 
 def area_barca(righe, colonne, riga, colonna, lunghezza, orientamento):
-	tabella = crea_tabella(righe, colonne, 0)
+	tabella = create_table(righe, colonne, 0)
 	if orientamento:
 		#verticale
 		for x in range(lunghezza):
@@ -447,7 +473,7 @@ def lista_navi_possibili(tab_attacco, lista_tutte_navi):
 
 
 def tabella_probabilita(righe, colonne, lista_navi_possibili, lista_navi_mancanti):
-	tabella = crea_tabella(righe, colonne, 0)
+	tabella = create_table(righe, colonne, 0)
 	
 	lunghezza_navi_possibili = []
 	for nave in lista_navi_possibili:
@@ -481,7 +507,7 @@ def calcola_tabella_probabilita(tab_attacco, navi_rimanenti):
 	
 	
 def genera_rete(righe, colonne, dimensione_nave):
-    tabella = crea_tabella(righe, colonne, 0)
+    tabella = create_table(righe, colonne, 0)
     for r in range(righe):
         for c in range(colonne):
             if (c+r)%dimensione_nave==0:
@@ -520,7 +546,7 @@ def tabella_to_lista(tabella, elemento):
 
 #tabella con tutte le mosse legali (0 = non legale, 1 = legale)
 def tabella_legal_mooves(tabella_attacco):
-    tabella = crea_tabella(len(tabella_attacco), len(tabella_attacco[0]), 0)
+    tabella = create_table(len(tabella_attacco), len(tabella_attacco[0]), 0)
 
     for rig in range(len(tabella)):
         for col in range(len(tabella[0])):
@@ -545,8 +571,8 @@ def loop():
     conta_giochi = 0
     somma_mosse = 0
 
-    tabella_difesa = crea_tabella(RIGHE, COLONNE, 0)
-    navi = NAVI
+    tabella_difesa = create_table(ROWS, COLUMNS, 0)
+    navi = SHIPS
     posiziona_navi(tabella_difesa, navi)
 
 
@@ -554,16 +580,16 @@ def loop():
         conta_giochi += 1
 
         if conta_giochi%10 == 0:
-            tabella_difesa = crea_tabella(RIGHE, COLONNE, 0)
+            tabella_difesa = create_table(ROWS, COLUMNS, 0)
             posiziona_navi(tabella_difesa, navi)
 
-        tabella_attacco = crea_tabella(RIGHE, COLONNE, "O")
+        tabella_attacco = create_table(ROWS, COLUMNS, "O")
 
         mosse = gioco_bot(tabella_attacco, tabella_difesa, navi)
 
         somma_mosse += mosse
 
-        #stampa_tabella(tabella_attacco)
+        #print_table(tabella_attacco)
 
         if conta_giochi%100 == 0:
             print(str(somma_mosse/conta_giochi) + " -   " + str(mosse)+ "   -   " + str(conta_giochi))
@@ -578,24 +604,24 @@ if __name__ == "__main__":
 
 
 
-    """tabella_attacco = crea_tabella(RIGHE, COLONNE, "O")
-    tabella_difesa = crea_tabella(RIGHE, COLONNE, 0)
-    navi = NAVI
+    """tabella_attacco = create_table(ROWS, COLUMNS, "O")
+    tabella_difesa = create_table(ROWS, COLUMNS, 0)
+    navi = SHIPS
 
     posiziona_navi(tabella_difesa, navi)
 
-    stampa_tabella(tabella_difesa)
+    print_table(tabella_difesa)
     print("")
 
     gioco_bot(tabella_attacco, tabella_difesa, navi)
 
     #gioco(tabella_attacco, tabella_difesa)
 
-    stampa_tabella(tabella_attacco)"""
+    print_table(tabella_attacco)"""
 
     loop()
 
-    #stampa_tabella(genera_rete(RIGHE, COLONNE, 3))
+    #print_table(genera_rete(ROWS, COLUMNS, 3))
     #input("Finito")
 
 
