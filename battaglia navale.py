@@ -93,34 +93,42 @@ def attack(attack_table, ship_positioning_table, row, columns):
 
 
 def check_hit_and_sunk(attack_table, ship_positioning_table, row, columns):
+    """
+    Checks if an attack hit and sunk a ship at the specified position.
 
+    Parameters:
+    - attack_table (list): The table representing the state of attacks, where "O" denotes an unattacked position.
+    - ship_positioning_table (list): The table representing the positions of ships, where 0 denotes an empty position.
+    - row (int): The row index of the attack position (1-indexed).
+    - columns (int): The column index of the attack position (1-indexed).
+
+    Note:
+    - If the attack did not hit a ship or the ship is not completely sunk, the function returns without any action.
+    - If the attack hit and sunk a ship, the function marks all parts of the ship with "Y" in the attack_table.
+    """
     row -= 1
     columns -= 1
 
     ship_number = ship_positioning_table[row][columns]
 
     if ship_number == 0:
-        return 0
+        return  # No ship is hit
 
-    #controlla se ci sono pezzi di barca rimanenti
+    # Check if there are remaining pieces of the ship
     for r in range(len(ship_positioning_table)):
         for c in range(len(ship_positioning_table[0])):
-            if ship_positioning_table[r][c] == ship_number:
-                if attack_table[r][c] == "O":
-                    return 0
-                    #se ci sono fine funzione
+            if ship_positioning_table[r][c] == ship_number and attack_table[r][c] == "O":
+                return  # Ship is not completely sunk, exit function
 
-    #altrimenti continua
-    #e cambia tutti i pezzi della barca con il simbolo colpito e affondato
+    # If all pieces of the ship are hit, mark them as sunk
     for r in range(len(ship_positioning_table)):
         for c in range(len(ship_positioning_table[0])):
             if ship_positioning_table[r][c] == ship_number:
                 attack_table[r][c] = "Y"
 
-    return 1
 
 
-def win(attack_table, ship_positioning_table):
+def check_win(attack_table, ship_positioning_table):
 
     #contiene tutte le parti ancora da colpire
     tabella_sovrapposizione = create_table(len(attack_table), len(attack_table[0]), 0)
@@ -153,21 +161,30 @@ def calcola_navi_rimanenti(attack_table, ship_positioning_table, navi):
 
     navi_rimanenti=[]
     for nav in range(len(navi)):
-        if conta_elemento_in_tabella(tabella_sovrapposizione, nav+1) > 0:
+        if count_element_in_table(tabella_sovrapposizione, nav+1) > 0:
             navi_rimanenti.append(navi[nav])
 
     return navi_rimanenti
 
 
 
-#restituisce il numero di volte che un elemento è contenuto in una tabella
-def conta_elemento_in_tabella(tabella, elemento):
-    conteggio = 0
+def count_element_in_table(table, element):
+    """
+    Returns the number of times an element is contained in a table.
 
-    for riga in tabella:
-        conteggio += riga.count(elemento)
+    Parameters:
+    - table (list): The table in which to count occurrences of the element.
+    - element: The element to count.
 
-    return conteggio
+    Returns:
+    - int: The count of occurrences of the specified element in the table.
+    """
+    count = 0
+
+    for row in table:
+        count += row.count(element)
+
+    return count
 
 
 ################################################################################
@@ -193,7 +210,7 @@ def gioco(tabella_attacco, tabella_difesa):
 
         attack(tabella_attacco, tabella_difesa, riga, colonna)
         check_hit_and_sunk(tabella_attacco, tabella_difesa, riga, colonna)
-        if win(tabella_attacco, tabella_difesa):
+        if check_win(tabella_attacco, tabella_difesa):
             print("Hai vinto!")
             return
 
@@ -231,7 +248,7 @@ def gioco_bot(tabella_attacco, tabella_difesa, navi):
 
         attack(tabella_attacco, tabella_difesa, riga, colonna)
         check_hit_and_sunk(tabella_attacco, tabella_difesa, riga, colonna)
-        if win(tabella_attacco, tabella_difesa):
+        if check_win(tabella_attacco, tabella_difesa):
             #print("Hai vinto!")
             return conta_mosse
 
@@ -266,15 +283,24 @@ def posiziona_navi(tabella, navi):
                     posizionata = True
 
 
-def estrai_navi(tabella):
+def get_ships(table):
+    """
+    Retrieves the number of ships in the table.
 
-    numero_barche = max(max(tabella, key=max))
-    lista=[]
+    Parameters:
+    - table (list): The table representing the positions of ships, where 0 denotes an empty position.
 
-    for numero in range(numero_barche):
-        lista.append(conta_elemento_in_tabella(tabella, numero+1))
+    Returns:
+    - list: A list containing the number of ships in the table.
+    """
+    number_of_ships = max(max(table, key=max))
+    ship_counts = []
 
-    return lista
+    for num in range(number_of_ships):
+        ship_counts.append(count_element_in_table(table, num + 1))
+
+    return ship_counts
+
 
 
 #circa 97.73176 tentativi in 21000 partite
@@ -412,6 +438,7 @@ def trova_coordinate_massimo(tabella):
 
     return indice_riga_massimo+1, indice_colonna_massimo+1
 
+#orientamento: 1 = vertivale, 0 = orizzontale
 def area_barca(righe, colonne, riga, colonna, lunghezza, orientamento):
 	tabella = create_table(righe, colonne, 0)
 	if orientamento:
@@ -427,17 +454,26 @@ def area_barca(righe, colonne, riga, colonna, lunghezza, orientamento):
 	return tabella
 
 
-def elimina_duplicati(lista):
-	nuova_lista = []
-	for element in lista:
-		if element not in nuova_lista:
-			nuova_lista.append(element)
-	
-	return nuova_lista
+def remove_duplicates(lst):
+    """
+    Removes duplicate elements from a list.
+
+    Parameters:
+    - lst (list): The list containing elements, some of which may be duplicates.
+
+    Returns:
+    - list: A new list containing unique elements, preserving the order of the original list.
+    """
+    new_list = []
+    for element in lst:
+        if element not in new_list:
+            new_list.append(element)
+
+    return new_list
 
 
 def lista_con_tutte_le_navi(righe, colonne, navi_rimanenti):
-	navi = elimina_duplicati(navi_rimanenti)
+	navi = remove_duplicates(navi_rimanenti)
 	lista = []
 	
 	for lunghezza in navi:
@@ -479,7 +515,7 @@ def tabella_probabilita(righe, colonne, lista_navi_possibili, lista_navi_mancant
 	for nave in lista_navi_possibili:
 		lunghezza_navi_possibili.append(nave[2])
 	
-	navi_esistenti = elimina_duplicati(lista_navi_mancanti)
+	navi_esistenti = remove_duplicates(lista_navi_mancanti)
 	
 	for nave in navi_esistenti:
 		mancanti = lista_navi_mancanti.count(nave)
