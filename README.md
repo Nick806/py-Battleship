@@ -10,5 +10,5 @@ Battleship on python, different gamemode and Bot implementation
 - [ ] Make functions more optimized
 - [ ] Write some documentation
 - [ ] Add a file to with the icons (like "X", "O" etc.) and make a function that allow to change it from the program
-- [ ] Add the possibility to choose w"pygame"hat data is printed
-- [ ] Add a gui, perhaps using 
+- [ ] Add the possibility to choose what data is printed
+- [ ] Add a gui, perhaps using "pygame"
