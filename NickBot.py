@@ -6,14 +6,8 @@ import importlib
 
 # fondamental function
 
-def take_shot(tabella_attacco, navi_rimanenti):
-    lista_mosse_legali = legal_moves_list(tabella_attacco)
-    mossa = random.randint(0, len(lista_mosse_legali)-1)
-
-    riga = lista_mosse_legali[mossa][0]
-    colonna = lista_mosse_legali[mossa][1]
-
-    return riga, colonna
+def take_shot(attack_table, remaining_ships):
+    return my_bot_4(attack_table, remaining_ships)
 
 def place_ships(tabella, navi):
     righe = len(tabella)-1

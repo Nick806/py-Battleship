@@ -22,6 +22,12 @@ Significato dei simboli nelle tabelle:
 
 """
 
+import random
+import time
+import os
+import importlib
+
+
 # global
 
 COLUMNS = 10
@@ -30,11 +36,11 @@ ROWS = 10
 SHIPS = [2,2,2,2,3,3,3,4,4,5]
 # each number corresponds to the length of a ship
 
+directory = "Bots"
 
-import random
-import time
-import os
-import importlib
+bot_name = "NickBot.py"
+
+bot_directory = "NickBot.py"
 
 
 ################################################################################
@@ -282,7 +288,7 @@ def gioco_bot(tabella_attacco, tabella_difesa, navi):
         print("")"""
 
 
-        riga, colonna = execute_function("NickBot.py", "take_shot", tabella_attacco, get_remaining_ships(tabella_attacco, tabella_difesa, navi))
+        riga, colonna = execute_function(bot_directory, "take_shot", tabella_attacco, get_remaining_ships(tabella_attacco, tabella_difesa, navi))
 
         #print(str(riga) + " " + str(colonna))
         #print("")
@@ -303,7 +309,7 @@ def loop():
 
     tabella_difesa = create_table(ROWS, COLUMNS, 0)
     navi = SHIPS
-    execute_function("NickBot.py", "place_ships", tabella_difesa, navi)
+    execute_function(bot_directory, "place_ships", tabella_difesa, navi)
 
 
     while True:
@@ -311,7 +317,7 @@ def loop():
 
         if conta_giochi%10 == 0:
             tabella_difesa = create_table(ROWS, COLUMNS, 0)
-            execute_function("NickBot.py", "place_ships", tabella_difesa, navi)
+            execute_function(bot_directory, "place_ships", tabella_difesa, navi)
 
         tabella_attacco = create_table(ROWS, COLUMNS, "O")
 
@@ -380,6 +386,8 @@ def execute_function(file_path, function_name, parameter1, parameter2):
 if __name__ == "__main__":
 
 
+
+    print(bot_directory)
 
     """tabella_attacco = create_table(ROWS, COLUMNS, "O")
     tabella_difesa = create_table(ROWS, COLUMNS, 0)
