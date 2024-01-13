@@ -38,10 +38,6 @@ SHIPS = [2,2,2,2,3,3,3,4,4,5]
 
 directory = "Bots"
 
-bot_name = "NickBot.py"
-
-bot_directory = "NickBot.py"
-
 
 ################################################################################
 #   Section with basic functions
@@ -265,7 +261,7 @@ def game(attack_table, defense_table):
 
 
 
-def gioco_bot(tabella_attacco, tabella_difesa, navi):
+def gioco_bot(tabella_attacco, tabella_difesa, navi, bot_directory):
 
     conta_mosse = 0
 
@@ -303,7 +299,7 @@ def gioco_bot(tabella_attacco, tabella_difesa, navi):
             return conta_mosse
 
 
-def loop():
+def loop(bot_directory):
     conta_giochi = 0
     somma_mosse = 0
 
@@ -321,7 +317,7 @@ def loop():
 
         tabella_attacco = create_table(ROWS, COLUMNS, "O")
 
-        mosse = gioco_bot(tabella_attacco, tabella_difesa, navi)
+        mosse = gioco_bot(tabella_attacco, tabella_difesa, navi, bot_directory)
 
         somma_mosse += mosse
 
@@ -363,8 +359,8 @@ def execute_function(file_path, function_name, parameter1, parameter2):
     result = None  # Initialize result to handle cases where the function is not called
 
     try:
-        module_name = os.path.splitext(os.path.basename(file_path))[0]
-        module = importlib.import_module(module_name)
+        module_path = os.path.splitext(file_path)[0].replace(os.path.sep, '.')
+        module = importlib.import_module(module_path)
         function_to_execute = getattr(module, function_name, None)
 
         if callable(function_to_execute):
@@ -378,6 +374,30 @@ def execute_function(file_path, function_name, parameter1, parameter2):
 
     return result
 
+def list_files(folder):
+    """
+    Lists files in the specified folder.
+
+    Parameters:
+    - folder (str): The path to the folder.
+
+    Returns:
+    - list: A list of filenames in the folder.
+
+    Note:
+    - If the folder does not exist, an appropriate message is printed, and an empty list is returned.
+    - Any other errors during the operation are caught, and an empty list is returned.
+    """
+    try:
+        files = [f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f))]
+        return files
+    except FileNotFoundError:
+        print(f"The folder '{folder}' does not exist.")
+        return []
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return []
+
 
 ################################################################################
 #   MAIN
@@ -385,9 +405,13 @@ def execute_function(file_path, function_name, parameter1, parameter2):
 
 if __name__ == "__main__":
 
+    print(list_files("Bots"))
 
+    file = "Bots\\NickBot.py"
 
-    print(bot_directory)
+    print(execute_function(file, "take_shot", create_table(10,10,"O"), SHIPS))
+
+    #print(bot_directory)
 
     """tabella_attacco = create_table(ROWS, COLUMNS, "O")
     tabella_difesa = create_table(ROWS, COLUMNS, 0)
@@ -404,7 +428,7 @@ if __name__ == "__main__":
 
     print_table(tabella_attacco)"""
 
-    loop()
+    #loop(bot_directory)
 
     #print_table(generate_net(ROWS, COLUMNS, 3))
     #input("Finito")
