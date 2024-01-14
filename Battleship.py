@@ -83,13 +83,15 @@ def play_gamemode(gamemode):
     gamemode = int(gamemode)
 
     if gamemode == 1:
-        print("Still to do (1)")
+        gamemode1()
 
     elif gamemode == 2:
-        print("Still to do (2)")
+        gamemode2()
 
     elif gamemode == 3:
        print("Still to do (3)")
+
+
 
 
 ################################################################################
@@ -276,8 +278,14 @@ def get_ships(table):
 
 
 ################################################################################
-#   Section with game functions
+#   Section with different game modes
 ################################################################################
+
+def gamemode1():
+    ship_positioning_table = create_table(ROWS, COLUMNS, 0)
+    execute_function(random_bot_ship_placer, "place_ships", ship_positioning_table, SHIPS)
+    game(create_table(ROWS, COLUMNS, "O"), ship_positioning_table)
+
 
 def game(attack_table, ship_positioning_table):
     """
@@ -293,11 +301,15 @@ def game(attack_table, ship_positioning_table):
     - The game continues until the player wins.
     """
     moove = 0
+
+    ships = SHIPS
     while True:
         print_table(attack_table)
         
         moove += 1
         print("Moove number " + str(moove))
+        remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, ships)
+        print("Remaining ships: " + str(remaining_ships))
 
         while True:
             try:
@@ -317,6 +329,42 @@ def game(attack_table, ship_positioning_table):
             print("You won!")
             return
 
+
+def gamemode2():
+    ship_positioning_table = create_table(ROWS, COLUMNS, 0)
+    execute_function(random_bot_ship_placer, "place_ships", ship_positioning_table, SHIPS)
+    ships = SHIPS
+
+    bot_directory =os.path.join(directory, input("Name of the bot (with file extension): "))
+
+    attack_table = create_table(ROWS, COLUMNS, "O")
+
+    moove = 0
+    while True:
+        print_table(attack_table)
+        
+        moove += 1
+        print("Moove number " + str(moove))
+
+        remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, ships)
+        print("Remaining ships: " + str(remaining_ships))
+
+        row, column = execute_function(bot_directory, "take_shot", attack_table, remaining_ships)
+
+        print ("Row: " + str(row) + "   Column: " + str(column))
+
+        input("Press ENTER to step")
+
+        print_table(" ")
+
+
+        attack(attack_table, ship_positioning_table, row, column)
+        check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
+        
+        if check_win(attack_table, ship_positioning_table):
+            print_table(attack_table)
+            print("You won! (" + str(moove) + " mooves)")
+            return
 
 
 #TODO Write this in english
@@ -471,8 +519,7 @@ if __name__ == "__main__":
     play_gamemode(gamemode)
 
 
-    input("Pres ENTER to close....")   
-    
+    input("Pres ENTER to close....") 
     
     """print(list_files("Bots"))
 

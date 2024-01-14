@@ -36,6 +36,7 @@ Get creative, have fun, and share your bot creations with the community! Everyon
 - [ ] Add the possibilities to choose between different game modes
 - [x] Separate the "main" program from the "bot" porgrams **(made the program more slow)**
 - [ ] Make functions more optimized
+- [ ] Change the "place_ships" to return the table and get in input Rows and columns
 - [ ] Write some documentation
 - [ ] Write the file: "HOW_TO_MAKE_MY_BOT.md"
 - [ ] Add a file with the icons (like "X", "O" etc.) and make a function that allow to change it from the program
