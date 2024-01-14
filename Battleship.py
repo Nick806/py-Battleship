@@ -38,11 +38,63 @@ SHIPS = [2,2,2,2,3,3,3,4,4,5]
 
 directory = "Bots"
 
+random_bot_ship_placer = "Bots\RandomBot.py"
+
+
+################################################################################
+#   GUI functions
+################################################################################
+
+def print_start():
+    name = """
+                            $$$$$$$\             $$\     $$\     $$\                     $$\       $$\           
+                            $$  __$$\            $$ |    $$ |    $$ |                    $$ |      \__|          
+ $$$$$$\  $$\   $$\         $$ |  $$ | $$$$$$\ $$$$$$\ $$$$$$\   $$ | $$$$$$\   $$$$$$$\ $$$$$$$\  $$\  $$$$$$\  
+$$  __$$\ $$ |  $$ |$$$$$$\ $$$$$$$\ | \____$$\\\_$$  _|\_$$  _|  $$ |$$  __$$\ $$  _____|$$  __$$\ $$ |$$  __$$\ 
+$$ /  $$ |$$ |  $$ |\______|$$  __$$\  $$$$$$$ | $$ |    $$ |    $$ |$$$$$$$$ |\$$$$$$\  $$ |  $$ |$$ |$$ /  $$ |
+$$ |  $$ |$$ |  $$ |        $$ |  $$ |$$  __$$ | $$ |$$\ $$ |$$\ $$ |$$   ____| \____$$\ $$ |  $$ |$$ |$$ |  $$ |
+$$$$$$$  |\$$$$$$$ |        $$$$$$$  |\$$$$$$$ | \$$$$/  \$$$$  |$$ |\$$$$$$$\ $$$$$$$  |$$ |  $$ |$$ |$$$$$$$  |
+$$  ____/  \____$$ |        \_______/  \_______|  \____/  \____/ \__| \_______|\_______/ \__|  \__|\__|$$  ____/ 
+$$ |      $$\   $$ |                                                                                   $$ |      
+$$ |      \$$$$$$  |                                                                                   $$ |      
+\__|       \______/                                                                                    \__|      
+
+beta version                                                                                        by Nick806
+"""
+    print(name)
+
+
+
+def input_gamemode():
+    modes = """
+
+Select a game mode [1-3]:
+
+1) Uman gamepay whit random bot ship positioning
+2) Step-by-step Bot gameplay whit random bot ship positioning (you can choose the bot that will play)
+3) Automatic and loop Bot gamepay whit random bot ship positioning (you can choose the bot that will play)
+
+Gamemode n°... """
+    return input(modes)
+
+
+def play_gamemode(gamemode):
+
+    gamemode = int(gamemode)
+
+    if gamemode == 1:
+        print("Still to do (1)")
+
+    elif gamemode == 2:
+        print("Still to do (2)")
+
+    elif gamemode == 3:
+       print("Still to do (3)")
+
 
 ################################################################################
 #   Section with basic functions
 ################################################################################
-
 
 def create_table(rows, columns, elements):
     """
@@ -222,25 +274,30 @@ def get_ships(table):
 
     return ship_counts
 
+
 ################################################################################
 #   Section with game functions
 ################################################################################
 
-def game(attack_table, defense_table):
+def game(attack_table, ship_positioning_table):
     """
     Initiates and manages the gameplay loop.
 
     Parameters:
     - attack_table (list): The table representing the state of attacks, where "O" denotes an unattacked position.
-    - defense_table (list): The table representing the positions of ships, where 0 denotes an empty position.
+    - ship_positioning_table (list): The table representing the positions of ships, where 0 denotes an empty position.
 
     Note:
     - The function manages the player's turns, taking input for row and column to perform an attack.
     - It then updates the attack table and checks for hits and sunk ships.
     - The game continues until the player wins.
     """
+    moove = 0
     while True:
         print_table(attack_table)
+        
+        moove += 1
+        print("Moove number " + str(moove))
 
         while True:
             try:
@@ -252,15 +309,18 @@ def game(attack_table, defense_table):
 
             break  # Exit the loop if the input is valid
 
-        attack(attack_table, defense_table, row, column)
-        check_hit_and_sunk(attack_table, defense_table, row, column)
+        attack(attack_table, ship_positioning_table, row, column)
+        check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
         
-        if check_win(attack_table, defense_table):
+        if check_win(attack_table, ship_positioning_table):
+            print_table(attack_table)
             print("You won!")
             return
 
 
 
+#TODO Write this in english
+        
 def gioco_bot(tabella_attacco, tabella_difesa, navi, bot_directory):
 
     conta_mosse = 0
@@ -298,7 +358,6 @@ def gioco_bot(tabella_attacco, tabella_difesa, navi, bot_directory):
             #print("Hai vinto!")
             return conta_mosse
 
-
 def loop(bot_directory):
     conta_giochi = 0
     somma_mosse = 0
@@ -329,7 +388,6 @@ def loop(bot_directory):
         #if mosse < 80:
         #    print(str(mosse)+ "  " + str(conta_giochi))
         #    return
-
 
 
 ################################################################################
@@ -405,11 +463,22 @@ def list_files(folder):
 
 if __name__ == "__main__":
 
-    print(list_files("Bots"))
+
+    print_start()
+    
+    gamemode = input_gamemode()
+    
+    play_gamemode(gamemode)
+
+
+    input("Pres ENTER to close....")   
+    
+    
+    """print(list_files("Bots"))
 
     file = "Bots\\NickBot.py"
 
-    print(execute_function(file, "take_shot", create_table(10,10,"O"), SHIPS))
+    print(execute_function(file, "take_shot", create_table(10,10,"O"), SHIPS))"""
 
     #print(bot_directory)
 

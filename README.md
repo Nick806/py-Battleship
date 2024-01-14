@@ -32,11 +32,12 @@ Get creative, have fun, and share your bot creations with the community! Everyon
 
 ## TODO
 
-- [ ] Write the program in english
+- [x] Write the program in english **(most of it)**
 - [ ] Add the possibilities to choose between different game modes
 - [x] Separate the "main" program from the "bot" porgrams **(made the program more slow)**
 - [ ] Make functions more optimized
 - [ ] Write some documentation
-- [ ] Add a file to with the icons (like "X", "O" etc.) and make a function that allow to change it from the program
+- [ ] Write the file: "HOW_TO_MAKE_MY_BOT.md"
+- [ ] Add a file with the icons (like "X", "O" etc.) and make a function that allow to change it from the program
 - [ ] Add the possibility to choose what data is printed
 - [ ] Add a gui, perhaps using "pygame"

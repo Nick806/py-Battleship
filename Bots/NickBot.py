@@ -9,30 +9,30 @@ import importlib
 def take_shot(attack_table, remaining_ships):
     return my_bot_4(attack_table, remaining_ships)
 
-def place_ships(tabella, navi):
-    righe = len(tabella)-1
-    colonne = len(tabella[0])-1
+def place_ships(board, ships):
+    rows = len(board) - 1
+    columns = len(board[0]) - 1
 
-    numero_nave = 0
-    for lunghezza in navi:
-        numero_nave += 1
-        posizionata = False
-        while not posizionata:
-            orientamento = random.choice(['orizzontale', 'verticale'])
-            if orientamento == 'orizzontale':
-                colonna = random.randint(0, colonne - lunghezza)
-                riga = random.randint(0, righe)
-                if all(tabella[riga][colonna + i] == 0 for i in range(lunghezza)):
-                    for i in range(lunghezza):
-                        tabella[riga][colonna + i] = numero_nave
-                    posizionata = True
+    ship_number = 0
+    for length in ships:
+        ship_number += 1
+        placed = False
+        while not placed:
+            orientation = random.choice(['horizontal', 'vertical'])
+            if orientation == 'horizontal':
+                column = random.randint(0, columns - length)
+                row = random.randint(0, rows)
+                if all(board[row][column + i] == 0 for i in range(length)):
+                    for i in range(length):
+                        board[row][column + i] = ship_number
+                    placed = True
             else:
-                colonna = random.randint(0, colonne)
-                riga = random.randint(0, righe - lunghezza)
-                if all(tabella[riga + i][colonna] == 0 for i in range(lunghezza)):
-                    for i in range(lunghezza):
-                        tabella[riga + i][colonna] = numero_nave
-                    posizionata = True
+                column = random.randint(0, columns)
+                row = random.randint(0, rows - length)
+                if all(board[row + i][column] == 0 for i in range(length)):
+                    for i in range(length):
+                        board[row + i][column] = ship_number
+                    placed = True
 
 
 # basic functions
