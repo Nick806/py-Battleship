@@ -32,13 +32,29 @@ Get creative, have fun, and share your bot creations with the community! Everyon
 
 ## TODO
 
-- [x] Write the program in english **(most of it)**
-- [ ] Add the possibilities to choose between different game modes
-- [x] Separate the "main" program from the "bot" porgrams **(made the program more slow)**
 - [ ] Make functions more optimized
+
+### Better readability
+- [x] Write the program in english **(most of it)**
+- [x] Separate the "main" program from the "bot" porgrams **(made the program more slow)**
 - [ ] Change the "place_ships" to return the table and get in input Rows and columns
-- [ ] Write some documentation
-- [ ] Write the file: "HOW_TO_MAKE_MY_BOT.md"
-- [ ] Add a file with the icons (like "X", "O" etc.) and make a function that allow to change it from the program
+### More beautiful
+- [x] Add the title
 - [ ] Add the possibility to choose what data is printed
 - [ ] Add a gui, perhaps using "pygame"
+### More functionality
+- [ ] Add the possibilities to choose between different game modes
+  - [x] Player plays, random ship positioning
+  - [x] bot plays, step by step, random ship positioning
+  - [ ] bot plays in loop (to get the medium score)
+  - [ ] bot plays, step by step, player ship positioning
+- [ ] Add config file
+  - [ ] Change the icons
+  - [ ] some default directory and bots
+  - [ ] Choose what data is printed
+- [ ] Input of "ship_positioning_table"
+- [ ] Function to validate a "ship_positioning_table"
+### Write some documentation
+- [x] Add comments on the functions
+- [ ] Write the Readme.md
+- [ ] Write the file: "HOW_TO_MAKE_MY_BOT.md"

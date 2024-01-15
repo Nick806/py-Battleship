@@ -22,23 +22,50 @@ Significato dei simboli nelle tabelle:
 
 """
 
+
 import random
 import time
 import os
 import importlib
-
-
-# global
-
-COLUMNS = 10
-ROWS = 10
-
-SHIPS = [2,2,2,2,3,3,3,4,4,5]
-# each number corresponds to the length of a ship
-
-directory = "Bots"
+import configparser
 
 random_bot_ship_placer = "Bots\RandomBot.py"
+
+################################################################################
+#   Settings functions
+################################################################################
+
+class symbols:
+    def __init__(self, unknown, miss, hit, sunk):
+        self.unknown = unknown
+        self.miss = miss
+        self.hit = hit
+        self.sunk = sunk
+
+#set the default value of every variable
+default_symbols = symbols("O", "A", "X", "Y")
+config_symbols = symbols("O", "A", "X", "Y")
+
+ROWS = 10
+COLUMNS = 10
+SHIPS = [2,2,2,2,3,3,3,4,4,5]
+
+bots_folder = "Bots"
+
+def retrive_config():
+    config = configparser.ConfigParser()
+    config.read('config.ini', encoding='utf-8')
+
+    config_symbols.unknown = str(config.get('symbols', 'unknown'))
+    config_symbols.miss = str(config.get('symbols', 'miss'))
+    config_symbols.hit = str(config.get('symbols', 'hit'))
+    config_symbols.sunk = str(config.get('symbols', 'sunk'))
+
+    SHIPS = list(map(int, config.get('game', 'ships').split(',')))
+    ROWS = int(config.get('game', 'rows'))
+    COLUMNS = int(config.get('game', 'columns'))
+
+    bots_folder = config.get('settings', 'bots_folder')
 
 
 ################################################################################
@@ -63,8 +90,6 @@ beta version                                                                    
 """
     print(name)
 
-
-
 def input_gamemode():
     modes = """
 
@@ -76,7 +101,6 @@ Select a game mode [1-3]:
 
 Gamemode n°... """
     return input(modes)
-
 
 def play_gamemode(gamemode):
 
@@ -90,9 +114,6 @@ def play_gamemode(gamemode):
 
     elif gamemode == 3:
        print("Still to do (3)")
-
-
-
 
 ################################################################################
 #   Section with basic functions
@@ -335,7 +356,7 @@ def gamemode2():
     execute_function(random_bot_ship_placer, "place_ships", ship_positioning_table, SHIPS)
     ships = SHIPS
 
-    bot_directory =os.path.join(directory, input("Name of the bot (with file extension): "))
+    bot_directory =os.path.join(bots_folder, input("Name of the bot (with file extension): "))
 
     attack_table = create_table(ROWS, COLUMNS, "O")
 
@@ -511,7 +532,19 @@ def list_files(folder):
 
 if __name__ == "__main__":
 
+    print('\u25A3')
 
+    print(default_symbols.hit)
+    print(config_symbols.hit)
+    print(" ")
+    retrive_config()
+    print(default_symbols.hit)
+    print(config_symbols.hit)
+
+
+
+    """
+    
     print_start()
     
     gamemode = input_gamemode()
@@ -519,7 +552,21 @@ if __name__ == "__main__":
     play_gamemode(gamemode)
 
 
-    input("Pres ENTER to close....") 
+    input("Pres ENTER to close....")
+
+
+    """
+
+
+
+
+
+
+
+
+
+
+
     
     """print(list_files("Bots"))
 
