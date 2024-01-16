@@ -74,24 +74,6 @@ def create_table(rows, columns, elements):
     table = [[elements for _ in range(columns)] for _ in range(rows)]
     return table
 
-def count_element_in_table(table, element):
-    """
-    Returns the number of times an element is contained in a table.
-
-    Parameters:
-    - table (list): The table in which to count occurrences of the element.
-    - element: The element to count.
-
-    Returns:
-    - int: The count of occurrences of the specified element in the table.
-    """
-    count = 0
-
-    for row in table:
-        count += row.count(element)
-
-    return count
-
 
 # bot secondary functions
 
