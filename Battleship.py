@@ -150,6 +150,28 @@ def print_table(table):
             print(item, end=" ")
         print()
 
+def print_attack(table):
+    """
+    Prints the elements of an attack table in a readable format.
+
+    Parameters:
+    - table (list): A 2D table represented as a list of lists.
+
+    Prints:
+    - Displays the elements of the attac table, with the selected icons.
+    """
+    for row in table:
+        for item in row:
+            if item == default_symbols.hit:
+                print(config_symbols.hit, end=" ")
+            elif item == default_symbols.miss:
+                print(config_symbols.miss, end=" ")
+            elif item == default_symbols.sunk:
+                print(config_symbols.sunk, end=" ")
+            elif item == default_symbols.unknown:
+                print(config_symbols.unknown, end=" ")
+        print()
+
 def count_element_in_table(table, element):
     """
     Returns the number of times an element is contained in a table.
@@ -325,7 +347,7 @@ def game(attack_table, ship_positioning_table):
 
     ships = SHIPS
     while True:
-        print_table(attack_table)
+        print_attack(attack_table)
         
         moove += 1
         print("Moove number " + str(moove))
@@ -346,7 +368,7 @@ def game(attack_table, ship_positioning_table):
         check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
         
         if check_win(attack_table, ship_positioning_table):
-            print_table(attack_table)
+            print_attack(attack_table)
             print("You won!")
             return
 
@@ -362,7 +384,7 @@ def gamemode2():
 
     moove = 0
     while True:
-        print_table(attack_table)
+        print_attack(attack_table)
         
         moove += 1
         print("Moove number " + str(moove))
@@ -376,14 +398,14 @@ def gamemode2():
 
         input("Press ENTER to step")
 
-        print_table(" ")
+        print(" ")
 
 
         attack(attack_table, ship_positioning_table, row, column)
         check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
         
         if check_win(attack_table, ship_positioning_table):
-            print_table(attack_table)
+            print_attack(attack_table)
             print("You won! (" + str(moove) + " mooves)")
             return
 
@@ -547,7 +569,7 @@ if __name__ == "__main__":
 
 
 
-    
+    retrive_config()
     
     print_start()
     
