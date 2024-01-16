@@ -444,115 +444,124 @@ def legal_moves_list(attack_table):
 ################################################################################
 
 #circa 97.76567 tentativi in 51800 partite
-def my_bot(tabella_attacco, navi_rimanenti):
-    lista_mosse_legali = legal_moves_list(tabella_attacco)
-    mossa = random.randint(0, len(lista_mosse_legali)-1)
+def my_bot_0(attack_table, remaining_ships):
+    legal_moves = legal_moves_list(attack_table)
+    move = random.randint(0, len(legal_moves)-1)
 
-    riga = lista_mosse_legali[mossa][0]
-    colonna = lista_mosse_legali[mossa][1]
+    row = legal_moves[move][0]
+    column = legal_moves[move][1]
 
-    return riga, colonna
+    return row, column
 
 #circa 77.907 tentativi in 20800 partite
-def my_bot_2(tabella_attacco, navi_rimanenti):
-    mosse_legali = legal_moves_table(tabella_attacco)
-    lista_mosse_legali = legal_moves_list(tabella_attacco)
+def my_bot_1(attack_table, remaining_ships):
+    legal_moves = legal_moves_list(attack_table)
 
-    lista_X = table_to_list(tabella_attacco, "X")
+    list_X = table_to_list(attack_table, "X")
 
-    if lista_X != 0:
+    if list_X != 0:
 
-        for indice in lista_X:
-            indice1 = indice[0]
-            indice2 = indice[1]
+        for index in list_X:
+            index1 = index[0]
+            index2 = index[1]
 
-            intorno = surrounding_coordinates(indice1, indice2)
-            mossa = common_elements(intorno, lista_mosse_legali)
+            surrounding = surrounding_coordinates(index1, index2)
+            move = common_elements(surrounding, legal_moves)
 
-            if len(mossa) > 0:
-                riga = mossa[0][0]
-                colonna = mossa[0][1]
-                return riga, colonna
+            if len(move) > 0:
+                row = move[0][0]
+                column = move[0][1]
+                return row, column
 
 
-    mossa = random.randint(0, len(lista_mosse_legali)-1)
+    move = random.randint(0, len(legal_moves)-1)
 
-    riga = lista_mosse_legali[mossa][0]
-    colonna = lista_mosse_legali[mossa][1]
+    row = legal_moves[move][0]
+    column = legal_moves[move][1]
 
-    return riga, colonna
+    return row, column
 
 #circa 70.57 tentativi in 17700 partite
-def my_bot_3(tabella_attacco, navi_rimanenti):
-    tabella_mosse_legali = legal_moves_table(tabella_attacco)
-    lista_mosse_legali = legal_moves_list(tabella_attacco)
+def my_bot_2(attack_table, remaining_ships):
+    legal_moves = legal_moves_list(attack_table)
 
 
 
-    lista_X = table_to_list(tabella_attacco, "X")
+    list_X = table_to_list(attack_table, "X")
 
-    if lista_X != 0:
+    if list_X != 0:
 
-        for indice in lista_X:
-            indice1 = indice[0]
-            indice2 = indice[1]
+        for index in list_X:
+            index1 = index[0]
+            index2 = index[1]
 
-            intorno = surrounding_coordinates(indice1, indice2)
-            mossa = common_elements(intorno, lista_mosse_legali)
+            surrounding = surrounding_coordinates(index1, index2)
+            move = common_elements(surrounding, legal_moves)
 
-            if len(mossa) > 0:
-                riga = mossa[0][0]
-                colonna = mossa[0][1]
-                return riga, colonna
+            if len(move) > 0:
+                row = move[0][0]
+                column = move[0][1]
+                return row, column
 
 
-    min_nave = min(navi_rimanenti)
+    min_nave = min(remaining_ships)
 
-    lista_rete = table_to_list(generate_net(len(tabella_attacco), len(tabella_attacco[0]), min_nave), 1)
+    net_list = table_to_list(generate_net(len(attack_table), len(attack_table[0]), min_nave), 1)
 
-    lista_mosse = common_elements(lista_rete, lista_mosse_legali)
+    list_move = common_elements(net_list, legal_moves)
 
-    mossa = random.randint(0, len(lista_mosse)-1)
+    move_list = random.randint(0, len(move_list)-1)
 
-    riga = lista_mosse[mossa][0]
-    colonna = lista_mosse[mossa][1]
+    row = move_list[move][0]
+    column = move_list[move][1]
 
-    return riga, colonna
+    return row, column
 
 #circa 64.6 mosse in 354 partite DIVERSE (non c'è più casualità)
-def my_bot_4(tabella_attacco, navi_rimanenti):
-    tabella_mosse_legali = legal_moves_table(tabella_attacco)
-    lista_mosse_legali = legal_moves_list(tabella_attacco)
+def my_bot_3(attack_table, remaining_ships):
+    legal_moves = legal_moves_list(attack_table)
 
 
 
-    lista_X = table_to_list(tabella_attacco, "X")
+    list_X = table_to_list(attack_table, "X")
 
-    if lista_X != 0:
+    if list_X != 0:
 
-        for indice in lista_X:
-            indice1 = indice[0]
-            indice2 = indice[1]
+        for index in list_X:
+            index1 = index[0]
+            index2 = index[1]
 
-            intorno = surrounding_coordinates(indice1, indice2)
-            mossa = common_elements(intorno, lista_mosse_legali)
+            surrounding = surrounding_coordinates(index1, index2)
+            move = common_elements(surrounding, legal_moves)
 
-            if len(mossa) > 0:
-                riga = mossa[0][0]
-                colonna = mossa[0][1]
-                return riga, colonna
+            if len(move) > 0:
+                row = move[0][0]
+                column = move[0][1]
+                return row, column
+            
+    return find_maximum_coordinates(calculate_probability_table(attack_table, remaining_ships))
 
 
-    """min_nave = min(navi_rimanenti)
+def my_bot_4(attack_table, remaining_ships):
+    legal_moves = legal_moves_list(attack_table)
 
-    lista_rete = table_to_list(generate_net(len(tabella_attacco), len(tabella_attacco[0]), min_nave), 1)
 
-    lista_mosse = common_elements(lista_rete, lista_mosse_legali)
 
-    mossa = random.randint(0, len(lista_mosse)-1)
+    list_X = table_to_list(attack_table, "X")
 
-    riga = lista_mosse[mossa][0]
-    colonna = lista_mosse[mossa][1]"""
+    if list_X != 0:
 
-    return find_maximum_coordinates(calculate_probability_table(tabella_attacco, navi_rimanenti))
+        for index in list_X:
+            index1 = index[0]
+            index2 = index[1]
+
+            surrounding = surrounding_coordinates(index1, index2)
+            move = common_elements(surrounding, legal_moves)
+
+            if len(move) > 0:
+                row = move[0][0]
+                column = move[0][1]
+                return row, column
+            
+    return find_maximum_coordinates(calculate_probability_table(attack_table, remaining_ships))
 
