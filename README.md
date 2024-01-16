@@ -49,8 +49,9 @@ Get creative, have fun, and share your bot creations with the community! Everyon
   - [ ] bot plays in loop (to get the medium score)
   - [ ] bot plays, step by step, player ship positioning
 - [ ] Add config file
-  - [ ] Change the icons
-  - [ ] some default directory and bots
+  - [x] Change the icons
+  - [x] some default directory and bots
+  - [x] number of rows and columns of the game
   - [ ] Choose what data is printed
 - [ ] Input of "ship_positioning_table"
 - [ ] Function to validate a "ship_positioning_table"
