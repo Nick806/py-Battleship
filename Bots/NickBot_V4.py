@@ -3,26 +3,77 @@ import random
 # fondamental function
 
 def take_shot(attack_table, remaining_ships):
-    lista_mosse_legali = legal_moves_list(attack_table)
+    legal_moves = legal_moves_list(attack_table)
+
+    print("ciao")
 
 
 
     list_X = table_to_list(attack_table, "X")
 
-    if list_X != 0:
+    if list_X != []:
 
-        for indice in list_X:
-            indice1 = indice[0]
-            indice2 = indice[1]
+        for coordinate in list_X:
 
-            intorno = surrounding_coordinates(indice1, indice2)
-            mossa = common_elements(intorno, lista_mosse_legali)
+            row = coordinate[0]
+            column = coordinate[1]
 
-            if len(mossa) > 0:
-                riga = mossa[0][0]
-                colonna = mossa[0][1]
-                return riga, colonna
+            surrounding = surrounding_coordinates(row, column)
+            surrounding_X = common_elements(surrounding, list_X)
+            
+            if surrounding_X != []:
 
+                for element in surrounding_X:
+                    print(element)
+                    if element [0] == row: #orizzontal
+                        r = row
+                        c = column
+                        while True: #to the left
+                            c-=1
+                            if attack_table[r-1][c-1] == "O":
+                                return r, c
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or c <= 0:
+                                break
+                        
+                        c = column
+                        while True: #to the right
+                            c+=1
+                            if attack_table[r-1][c-1] == "O":
+                                return r, c
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or c >= len(attack_table[0]):
+                                break
+
+
+                    elif element [1] == column: #vertical
+                        r = row
+                        c = column
+                        while True: #up
+                            r-=1
+                            if attack_table[r-1][c-1] == "O":
+                                return r, c
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or r <= 0:
+                                break
+                        
+                        r = row
+                        while True: #down
+                            r+=1
+                            if attack_table[r-1][c-1] == "O":
+                                return r, c
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or r >= len(attack_table):
+                                break
+
+        for coordinate in list_X:
+            coordinate1 = coordinate[0]
+            coordinate2 = coordinate[1]
+
+            surrounding = surrounding_coordinates(coordinate1, coordinate2)
+            move = common_elements(surrounding, legal_moves)
+
+            if len(move) > 0:
+                row = move[0][0]
+                column = move[0][1]
+                return row, column
+            
     return find_maximum_coordinates(calculate_probability_table(attack_table, remaining_ships))
 
 def place_ships(board, ships):

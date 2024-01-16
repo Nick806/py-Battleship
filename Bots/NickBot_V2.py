@@ -8,11 +8,11 @@ def take_shot(attack_table, remaining_ships):
 
 
 
-    lista_X = table_to_list(attack_table, "X")
+    list_X = table_to_list(attack_table, "X")
 
-    if lista_X != 0:
+    if list_X != 0:
 
-        for indice in lista_X:
+        for indice in list_X:
             indice1 = indice[0]
             indice2 = indice[1]
 
