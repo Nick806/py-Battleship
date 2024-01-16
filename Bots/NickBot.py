@@ -517,7 +517,7 @@ def my_bot_2(attack_table, remaining_ships):
 
     return row, column
 
-#circa 64.6 mosse in 354 partite DIVERSE (non c'è più casualità)
+#circa 65.2758 mosse in 1200 partite DIVERSE (non c'è più casualità)
 def my_bot_3(attack_table, remaining_ships):
     legal_moves = legal_moves_list(attack_table)
 
@@ -541,13 +541,9 @@ def my_bot_3(attack_table, remaining_ships):
             
     return find_maximum_coordinates(calculate_probability_table(attack_table, remaining_ships))
 
-
+#circa 61.5303 mosse in 5000 partite DIVERSE
 def my_bot_4(attack_table, remaining_ships):
     legal_moves = legal_moves_list(attack_table)
-
-    print("ciao")
-
-
 
     list_X = table_to_list(attack_table, "X")
 
@@ -564,23 +560,26 @@ def my_bot_4(attack_table, remaining_ships):
             if surrounding_X != []:
 
                 for element in surrounding_X:
-                    print(element)
                     if element [0] == row: #orizzontal
                         r = row
                         c = column
                         while True: #to the left
                             c-=1
-                            if attack_table[r-1][c-1] == "O":
+                            if c <= 0:
+                                break
+                            elif attack_table[r-1][c-1] == "O":
                                 return r, c
-                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or c <= 0:
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A":
                                 break
                         
                         c = column
                         while True: #to the right
                             c+=1
-                            if attack_table[r-1][c-1] == "O":
+                            if c > len(attack_table[0]):
+                                break
+                            elif attack_table[r-1][c-1] == "O":
                                 return r, c
-                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or c >= len(attack_table[0]):
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A":
                                 break
 
 
@@ -589,17 +588,21 @@ def my_bot_4(attack_table, remaining_ships):
                         c = column
                         while True: #up
                             r-=1
-                            if attack_table[r-1][c-1] == "O":
+                            if r <= 0:
+                                break
+                            elif attack_table[r-1][c-1] == "O":
                                 return r, c
-                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or r <= 0:
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A":
                                 break
                         
                         r = row
                         while True: #down
                             r+=1
-                            if attack_table[r-1][c-1] == "O":
+                            if r > len(attack_table):
+                                break
+                            elif attack_table[r-1][c-1] == "O":
                                 return r, c
-                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or r >= len(attack_table):
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A":
                                 break
 
         for coordinate in list_X:

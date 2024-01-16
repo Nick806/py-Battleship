@@ -28,8 +28,10 @@ import time
 import os
 import importlib
 import configparser
+import keyboard
 
 random_bot_ship_placer = "Bots\RandomBot.py"
+NUMBER_OF_DIGITS = 4
 
 ################################################################################
 #   Settings functions
@@ -98,6 +100,7 @@ Select a game mode [1-3]:
 1) Uman gamepay whit random bot ship positioning
 2) Step-by-step Bot gameplay whit random bot ship positioning (you can choose the bot that will play)
 3) Automatic and loop Bot gamepay whit random bot ship positioning (you can choose the bot that will play)
+3) Automatic and loop Bot gamepay whit random bot ship positioning, but return the max and the min move position(you can choose the bot that will play)
 
 Gamemode n°... """
     return input(modes)
@@ -113,7 +116,10 @@ def play_gamemode(gamemode):
         gamemode2()
 
     elif gamemode == 3:
-       print("Still to do (3)")
+       gamemode3()
+
+    elif gamemode == 4:
+       gamemode4()
 
 ################################################################################
 #   Section with basic functions
@@ -320,6 +326,25 @@ def get_ships(table):
     return ship_counts
 
 
+def over_possible_combination(rows, columns, ships):
+    over = 1
+    for ship in ships:
+        over *= ((rows+1-ships[0]) * columns) + ((columns+1-ships[0]) * rows)
+    return over
+
+def max_possible_combination(table, ships):
+
+    #TODO da completare
+
+    rows = len(table)
+    columns = len(table[0])
+
+    if len(ships) == 1:
+
+                #orizzontal                 #vertical
+        return ((rows+1-ships[0]) * columns) + ((columns+1-ships[0]) * rows)
+
+
 ################################################################################
 #   Section with different game modes
 ################################################################################
@@ -328,7 +353,6 @@ def gamemode1():
     ship_positioning_table = create_table(ROWS, COLUMNS, 0)
     execute_function(random_bot_ship_placer, "place_ships", ship_positioning_table, SHIPS)
     game(create_table(ROWS, COLUMNS, "O"), ship_positioning_table)
-
 
 def game(attack_table, ship_positioning_table):
     """
@@ -372,7 +396,6 @@ def game(attack_table, ship_positioning_table):
             print("You won!")
             return
 
-
 def gamemode2():
     ship_positioning_table = create_table(ROWS, COLUMNS, 0)
     execute_function(random_bot_ship_placer, "place_ships", ship_positioning_table, SHIPS)
@@ -382,12 +405,12 @@ def gamemode2():
 
     attack_table = create_table(ROWS, COLUMNS, "O")
 
-    moove = 0
+    move = 0
     while True:
         print_attack(attack_table)
         
-        moove += 1
-        print("Moove number " + str(moove))
+        move += 1
+        print("Moove number " + str(move))
 
         remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, ships)
         print("Remaining ships: " + str(remaining_ships))
@@ -406,8 +429,99 @@ def gamemode2():
         
         if check_win(attack_table, ship_positioning_table):
             print_attack(attack_table)
-            print("You won! (" + str(moove) + " mooves)")
+            print("You won! (" + str(move) + " moves)")
             return
+
+def gamemode3():
+    count_games = 0
+    count_moves = 0
+
+    bot_directory =os.path.join(bots_folder, input("Name of the bot (with file extension): "))
+
+    while True:
+        count_games += 1
+
+        ship_positioning_table = create_table(ROWS, COLUMNS, 0)
+        execute_function(random_bot_ship_placer, "place_ships", ship_positioning_table, SHIPS)
+        ships = SHIPS
+
+        attack_table = create_table(ROWS, COLUMNS, "O")
+
+        move = 0
+        while True:            
+            move += 1
+            remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, ships)
+            row, column = execute_function(bot_directory, "take_shot", attack_table, remaining_ships)
+
+            attack(attack_table, ship_positioning_table, row, column)
+            check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
+            
+            if check_win(attack_table, ship_positioning_table):
+                break
+
+        count_moves += move
+
+        average = "{:.{}f}".format(count_moves/count_games, NUMBER_OF_DIGITS)
+        
+        print("'S' for stop! - Average moves: " + average + "  -  Moves this game: " + str(move)+ "  -  Number of games: " + str(count_games))
+        
+        if keyboard.is_pressed('s'):
+            break
+
+def gamemode4():
+    count_games = 0
+    count_moves = 0
+
+    max_number_of_moves = 0
+    max_moves_ship_positioning_table = []
+
+    min_number_of_moves = ROWS*COLUMNS
+    min_moves_ship_positioning_table = []
+
+    bot_directory =os.path.join(bots_folder, input("Name of the bot (with file extension): "))
+
+    while True:
+        count_games += 1
+
+        ship_positioning_table = create_table(ROWS, COLUMNS, 0)
+        execute_function(random_bot_ship_placer, "place_ships", ship_positioning_table, SHIPS)
+        ships = SHIPS
+
+        attack_table = create_table(ROWS, COLUMNS, "O")
+
+        move = 0
+        while True:            
+            move += 1
+            remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, ships)
+            row, column = execute_function(bot_directory, "take_shot", attack_table, remaining_ships)
+
+            attack(attack_table, ship_positioning_table, row, column)
+            check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
+            
+            if check_win(attack_table, ship_positioning_table):
+                break
+        
+        if move > max_number_of_moves:
+            max_number_of_moves = move
+            max_moves_ship_positioning_table = ship_positioning_table
+        
+        if move < min_number_of_moves:
+            min_number_of_moves = move
+            min_moves_ship_positioning_table = ship_positioning_table
+
+        count_moves += move
+
+        average = "{:.{}f}".format(count_moves/count_games, NUMBER_OF_DIGITS)
+        
+        print("'S' for stop! - Average moves: " + average + "  -  Moves this game: " + str(move)+ "  -  Number of games: " + str(count_games)+ "  -  Max moves: " + str(max_number_of_moves)+ "  -  Min moves: " + str(min_number_of_moves))
+        
+        if keyboard.is_pressed('s'):
+            print("Max moves: " + str(max_number_of_moves))
+            print_table(max_moves_ship_positioning_table)
+            print(" ")
+            print("Min moves: " + str(min_number_of_moves))
+            print_table(min_moves_ship_positioning_table)
+            break
 
 
 #TODO Write this in english
@@ -554,21 +668,7 @@ def list_files(folder):
 
 if __name__ == "__main__":
 
-
-
-    """
-    print('\u25A3')
-
-    print(default_symbols.hit)
-    print(config_symbols.hit)
-    print(" ")
-    retrive_config()
-    print(default_symbols.hit)
-    print(config_symbols.hit)
-    """
-
-
-
+        
     retrive_config()
     
     print_start()
@@ -580,9 +680,7 @@ if __name__ == "__main__":
 
     input("Pres ENTER to close....")
 
-
-    
-
+        
 
 
 
@@ -593,6 +691,7 @@ if __name__ == "__main__":
 
 
 
+    #print(over_possible_combination(int(input("Rows: ")), int(input("Columns: ")), [2,2,2,2,3,3,3,4,4,5]))
     
     """print(list_files("Bots"))
 

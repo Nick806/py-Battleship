@@ -5,10 +5,6 @@ import random
 def take_shot(attack_table, remaining_ships):
     legal_moves = legal_moves_list(attack_table)
 
-    print("ciao")
-
-
-
     list_X = table_to_list(attack_table, "X")
 
     if list_X != []:
@@ -24,23 +20,26 @@ def take_shot(attack_table, remaining_ships):
             if surrounding_X != []:
 
                 for element in surrounding_X:
-                    print(element)
                     if element [0] == row: #orizzontal
                         r = row
                         c = column
                         while True: #to the left
                             c-=1
-                            if attack_table[r-1][c-1] == "O":
+                            if c <= 0:
+                                break
+                            elif attack_table[r-1][c-1] == "O":
                                 return r, c
-                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or c <= 0:
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A":
                                 break
                         
                         c = column
                         while True: #to the right
                             c+=1
-                            if attack_table[r-1][c-1] == "O":
+                            if c > len(attack_table[0]):
+                                break
+                            elif attack_table[r-1][c-1] == "O":
                                 return r, c
-                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or c >= len(attack_table[0]):
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A":
                                 break
 
 
@@ -49,17 +48,21 @@ def take_shot(attack_table, remaining_ships):
                         c = column
                         while True: #up
                             r-=1
-                            if attack_table[r-1][c-1] == "O":
+                            if r <= 0:
+                                break
+                            elif attack_table[r-1][c-1] == "O":
                                 return r, c
-                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or r <= 0:
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A":
                                 break
                         
                         r = row
                         while True: #down
                             r+=1
-                            if attack_table[r-1][c-1] == "O":
+                            if r > len(attack_table):
+                                break
+                            elif attack_table[r-1][c-1] == "O":
                                 return r, c
-                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A" or r >= len(attack_table):
+                            elif attack_table[r-1][c-1] == "Y" or attack_table[r-1][c-1] == "A":
                                 break
 
         for coordinate in list_X:

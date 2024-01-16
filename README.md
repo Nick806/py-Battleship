@@ -46,7 +46,8 @@ Get creative, have fun, and share your bot creations with the community! Everyon
 - [ ] Add the possibilities to choose between different game modes
   - [x] Player plays, random ship positioning
   - [x] bot plays, step by step, random ship positioning
-  - [ ] bot plays in loop (to get the medium score)
+  - [x] bot plays in loop (to get the medium score)
+  - [x] bot plays in loop (to get the max and min score)
   - [ ] bot plays, step by step, player ship positioning
 - [ ] Add config file
   - [x] Change the icons
