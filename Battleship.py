@@ -532,6 +532,9 @@ def list_files(folder):
 
 if __name__ == "__main__":
 
+
+
+    """
     print('\u25A3')
 
     print(default_symbols.hit)
@@ -540,10 +543,11 @@ if __name__ == "__main__":
     retrive_config()
     print(default_symbols.hit)
     print(config_symbols.hit)
-
-
-
     """
+
+
+
+    
     
     print_start()
     
@@ -555,7 +559,7 @@ if __name__ == "__main__":
     input("Pres ENTER to close....")
 
 
-    """
+    
 
 
 
