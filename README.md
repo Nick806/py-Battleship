@@ -40,6 +40,7 @@ Get creative, have fun, and share your bot creations with the community! Everyon
 - [ ] Change the "place_ships" to return the table and get in input Rows and columns
 ### More beautiful
 - [x] Add the title
+- [ ] Add a gui for Human input
 - [ ] Add the possibility to choose what data is printed
 - [ ] Add a gui, perhaps using "pygame"
 ### More functionality
