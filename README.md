@@ -33,6 +33,8 @@ Get creative, have fun, and share your bot creations with the community! Everyon
 ## TODO
 
 - [ ] Make functions more optimized
+- [ ] Add multi-threading
+- [ ] try use opencl
 
 ### Better readability
 - [x] Write the program in english **(most of it)**
@@ -51,6 +53,7 @@ Get creative, have fun, and share your bot creations with the community! Everyon
   - [x] bot plays in loop (to get the max and min score)
   - [ ] bot plays, step by step, player ship positioning
 - [ ] Add config file
+  - [ ] use a .env file
   - [x] Change the icons
   - [x] some default directory and bots
   - [x] number of rows and columns of the game
