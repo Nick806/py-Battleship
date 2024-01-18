@@ -121,6 +121,21 @@ def play_gamemode(gamemode):
     elif gamemode == 4:
        gamemode4()
 
+def select_a_bot(bots_folder, message):
+
+    bots = list_files(bots_folder)
+
+    for num,bot in enumerate(bots):
+        print(str(num) + " - " + bot)
+
+    index = int(input("Insert the number that correspond to the bot " + message + "..."))
+    while index<0 or index>(len(bots)-1):
+        print("Input non possible... retry")
+        index = int(input("Insert the number that correspond to the bot " + message + "..."))
+
+    return bots[index]
+
+
 ################################################################################
 #   Section with basic functions
 ################################################################################
@@ -398,7 +413,7 @@ def game(attack_table, ship_positioning_table):
 def gamemode2():
     ship_positioning_table = get_function(random_bot_ship_placer,"place_ships")(ROWS, COLUMNS, SHIPS)
 
-    bot_directory =os.path.join(bots_folder, input("Name of the bot (with file extension): "))
+    bot_directory =os.path.join(bots_folder, select_a_bot(bots_folder, ""))
 
     attack_table = create_table(ROWS, COLUMNS, "O")
 
@@ -435,7 +450,7 @@ def gamemode3():
     count_games = 0
     count_moves = 0
 
-    bot_directory =os.path.join(bots_folder, input("Name of the bot (with file extension): "))
+    bot_directory =os.path.join(bots_folder, select_a_bot(bots_folder, ""))
     
     bot_random_place_ship_function = get_function(random_bot_ship_placer,"place_ships")
     bot_attack_function = get_function(bot_directory,"take_shot")
@@ -480,7 +495,7 @@ def gamemode4():
     min_number_of_moves = ROWS*COLUMNS
     min_moves_ship_positioning_table = []
 
-    bot_directory =os.path.join(bots_folder, input("Name of the bot (with file extension): "))
+    bot_directory =os.path.join(bots_folder, select_a_bot(bots_folder, ""))
 
     bot_random_place_ship_function = get_function(random_bot_ship_placer,"place_ships")
     bot_attack_function = get_function(bot_directory,"take_shot")
@@ -663,7 +678,6 @@ def list_files(folder):
 ################################################################################
 
 if __name__ == "__main__":
-
         
     retrive_config()
     
@@ -673,10 +687,8 @@ if __name__ == "__main__":
     
     play_gamemode(gamemode)
 
-
     input("Pres ENTER to close....")
 
-        
 
 
 

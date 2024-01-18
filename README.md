@@ -46,6 +46,7 @@ Get creative, have fun, and share your bot creations with the community! Everyon
 - [ ] Add a gui for Human input
 - [ ] Add the possibility to choose what data is printed
 - [ ] Add a gui, perhaps using "pygame"
+- [x] Add better input for the bots
 ### More functionality
 - [ ] Add the possibilities to choose between different game modes
   - [x] Player plays, random ship positioning
