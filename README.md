@@ -59,7 +59,7 @@ Get creative, have fun, and share your bot creations with the community! Everyon
   - [x] some default directory and bots
   - [x] number of rows and columns of the game
   - [ ] Choose what data is printed
-- [ ] Input of "ship_positioning_table"
+- [ ] Input/output of "ship_positioning_table"
 - [ ] Function to validate a "ship_positioning_table"
 ### Write some documentation
 - [x] Add comments on the functions
