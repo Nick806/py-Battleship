@@ -351,7 +351,7 @@ def max_possible_combination(table, ships):
 
 def gamemode1():
     ship_positioning_table = create_table(ROWS, COLUMNS, 0)
-    execute_function(random_bot_ship_placer, "place_ships", ship_positioning_table, SHIPS)
+    get_function(random_bot_ship_placer,"place_ships")(ship_positioning_table, SHIPS)
     game(create_table(ROWS, COLUMNS, "O"), ship_positioning_table)
 
 def game(attack_table, ship_positioning_table):
@@ -398,12 +398,14 @@ def game(attack_table, ship_positioning_table):
 
 def gamemode2():
     ship_positioning_table = create_table(ROWS, COLUMNS, 0)
-    execute_function(random_bot_ship_placer, "place_ships", ship_positioning_table, SHIPS)
+    get_function(random_bot_ship_placer,"place_ships")(ship_positioning_table, SHIPS)
     ships = SHIPS
 
     bot_directory =os.path.join(bots_folder, input("Name of the bot (with file extension): "))
 
     attack_table = create_table(ROWS, COLUMNS, "O")
+
+    bot_attack_function = get_function(bot_directory,"take_shot")
 
     move = 0
     while True:
@@ -415,7 +417,7 @@ def gamemode2():
         remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, ships)
         print("Remaining ships: " + str(remaining_ships))
 
-        row, column = execute_function(bot_directory, "take_shot", attack_table, remaining_ships)
+        row, column = bot_attack_function(attack_table, remaining_ships)
 
         print ("Row: " + str(row) + "   Column: " + str(column))
 
@@ -437,21 +439,25 @@ def gamemode3():
     count_moves = 0
 
     bot_directory =os.path.join(bots_folder, input("Name of the bot (with file extension): "))
+    
+    bot_random_place_ship_function = get_function(random_bot_ship_placer,"place_ships")
+    bot_attack_function = get_function(bot_directory,"take_shot")
 
     while True:
         count_games += 1
 
         ship_positioning_table = create_table(ROWS, COLUMNS, 0)
-        execute_function(random_bot_ship_placer, "place_ships", ship_positioning_table, SHIPS)
+        bot_random_place_ship_function(ship_positioning_table, SHIPS)
         ships = SHIPS
 
         attack_table = create_table(ROWS, COLUMNS, "O")
+        
 
         move = 0
         while True:            
             move += 1
             remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, ships)
-            row, column = execute_function(bot_directory, "take_shot", attack_table, remaining_ships)
+            row, column = bot_attack_function(attack_table, remaining_ships)
 
             attack(attack_table, ship_positioning_table, row, column)
             check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
@@ -480,11 +486,14 @@ def gamemode4():
 
     bot_directory =os.path.join(bots_folder, input("Name of the bot (with file extension): "))
 
+    bot_random_place_ship_function = get_function(random_bot_ship_placer,"place_ships")
+    bot_attack_function = get_function(bot_directory,"take_shot")
+
     while True:
         count_games += 1
 
         ship_positioning_table = create_table(ROWS, COLUMNS, 0)
-        execute_function(random_bot_ship_placer, "place_ships", ship_positioning_table, SHIPS)
+        bot_random_place_ship_function(ship_positioning_table, SHIPS)
         ships = SHIPS
 
         attack_table = create_table(ROWS, COLUMNS, "O")
@@ -493,7 +502,7 @@ def gamemode4():
         while True:            
             move += 1
             remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, ships)
-            row, column = execute_function(bot_directory, "take_shot", attack_table, remaining_ships)
+            row, column = bot_attack_function(attack_table, remaining_ships)
 
             attack(attack_table, ship_positioning_table, row, column)
             check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
@@ -528,6 +537,8 @@ def gamemode4():
         
 def gioco_bot(tabella_attacco, tabella_difesa, navi, bot_directory):
 
+    bot_attack_function = get_function(bot_directory,"take_shot")
+
     conta_mosse = 0
 
     while True:
@@ -549,7 +560,7 @@ def gioco_bot(tabella_attacco, tabella_difesa, navi, bot_directory):
         print("")"""
 
 
-        riga, colonna = execute_function(bot_directory, "take_shot", tabella_attacco, get_remaining_ships(tabella_attacco, tabella_difesa, navi))
+        riga, colonna = bot_attack_function(tabella_attacco, get_remaining_ships(tabella_attacco, tabella_difesa, navi))
 
         #print(str(riga) + " " + str(colonna))
         #print("")
@@ -567,9 +578,11 @@ def loop(bot_directory):
     conta_giochi = 0
     somma_mosse = 0
 
+    bot_random_place_ship_function = get_function(random_bot_ship_placer,"place_ships")
+
     tabella_difesa = create_table(ROWS, COLUMNS, 0)
     navi = SHIPS
-    execute_function(bot_directory, "place_ships", tabella_difesa, navi)
+    bot_random_place_ship_function(tabella_difesa, navi)
 
 
     while True:
@@ -577,7 +590,7 @@ def loop(bot_directory):
 
         if conta_giochi%10 == 0:
             tabella_difesa = create_table(ROWS, COLUMNS, 0)
-            execute_function(bot_directory, "place_ships", tabella_difesa, navi)
+            bot_random_place_ship_function(tabella_difesa, navi)
 
         tabella_attacco = create_table(ROWS, COLUMNS, "O")
 
@@ -599,43 +612,32 @@ def loop(bot_directory):
 #   File management
 ################################################################################
 
-def execute_function(file_path, function_name, parameter1, parameter2):
+def get_function(file_path, function_name):
     """
-    Executes a specified function from a Python module file with additional parameters.
+    Dynamically imports a module from a file and retrieves the specified function.
 
     Parameters:
-    - file_path (str): The file path of the Python module (including file extension).
-    - function_name (str): The name of the function to be executed.
-    - parameter1: Pass this parameter to the executed function.
-    - parameter2: Pass this parameter to the executed function.
+    - file_path (str): The path to the Python file containing the module.
+    - function_name (str): The name of the function to retrieve.
 
     Returns:
-    - Any: The result of the executed function.
+    - the function of the file
 
-    Note:
-    - If the specified function is not present in the module, an appropriate message is printed.
-    - Any errors during the execution of the function are caught and printed as error messages.
-
-    Modifies:
-    - Can modify the two parameters.
+    If the function or module is not found, an error message is printed, and the program exits.
     """
-    result = None  # Initialize result to handle cases where the function is not called
-
     try:
         module_path = os.path.splitext(file_path)[0].replace(os.path.sep, '.')
         module = importlib.import_module(module_path)
         function_to_execute = getattr(module, function_name, None)
 
         if callable(function_to_execute):
-            # Call the function with the additional parameters
-            result = function_to_execute(parameter1, parameter2)
-            # print(f'Executed function {function_name}() in {file_path}, result: {result}')
+            return function_to_execute           
         else:
             print(f'Function {function_name}() is not present in {file_path}')
+            exit()
     except Exception as e:
         print(f'Error during execution of function {function_name}() in {file_path}: {e}')
-
-    return result
+        exit()
 
 def list_files(folder):
     """
