@@ -350,8 +350,7 @@ def max_possible_combination(table, ships):
 ################################################################################
 
 def gamemode1():
-    ship_positioning_table = create_table(ROWS, COLUMNS, 0)
-    get_function(random_bot_ship_placer,"place_ships")(ship_positioning_table, SHIPS)
+    ship_positioning_table = get_function(random_bot_ship_placer,"place_ships")(ROWS, COLUMNS, SHIPS)
     game(create_table(ROWS, COLUMNS, "O"), ship_positioning_table)
 
 def game(attack_table, ship_positioning_table):
@@ -397,9 +396,7 @@ def game(attack_table, ship_positioning_table):
             return
 
 def gamemode2():
-    ship_positioning_table = create_table(ROWS, COLUMNS, 0)
-    get_function(random_bot_ship_placer,"place_ships")(ship_positioning_table, SHIPS)
-    ships = SHIPS
+    ship_positioning_table = get_function(random_bot_ship_placer,"place_ships")(ROWS, COLUMNS, SHIPS)
 
     bot_directory =os.path.join(bots_folder, input("Name of the bot (with file extension): "))
 
@@ -414,7 +411,7 @@ def gamemode2():
         move += 1
         print("Moove number " + str(move))
 
-        remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, ships)
+        remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, SHIPS)
         print("Remaining ships: " + str(remaining_ships))
 
         row, column = bot_attack_function(attack_table, remaining_ships)
@@ -446,8 +443,7 @@ def gamemode3():
     while True:
         count_games += 1
 
-        ship_positioning_table = create_table(ROWS, COLUMNS, 0)
-        bot_random_place_ship_function(ship_positioning_table, SHIPS)
+        ship_positioning_table = bot_random_place_ship_function(ROWS, COLUMNS, SHIPS)
         ships = SHIPS
 
         attack_table = create_table(ROWS, COLUMNS, "O")
@@ -492,8 +488,8 @@ def gamemode4():
     while True:
         count_games += 1
 
-        ship_positioning_table = create_table(ROWS, COLUMNS, 0)
-        bot_random_place_ship_function(ship_positioning_table, SHIPS)
+        ship_positioning_table = bot_random_place_ship_function(ROWS, COLUMNS, SHIPS)
+        
         ships = SHIPS
 
         attack_table = create_table(ROWS, COLUMNS, "O")
@@ -580,17 +576,15 @@ def loop(bot_directory):
 
     bot_random_place_ship_function = get_function(random_bot_ship_placer,"place_ships")
 
-    tabella_difesa = create_table(ROWS, COLUMNS, 0)
+    tabella_difesa = bot_random_place_ship_function(ROWS, COLUMNS, navi)
     navi = SHIPS
-    bot_random_place_ship_function(tabella_difesa, navi)
 
 
     while True:
         conta_giochi += 1
 
         if conta_giochi%10 == 0:
-            tabella_difesa = create_table(ROWS, COLUMNS, 0)
-            bot_random_place_ship_function(tabella_difesa, navi)
+            tabella_difesa = bot_random_place_ship_function(ROWS, COLUMNS, navi)
 
         tabella_attacco = create_table(ROWS, COLUMNS, "O")
 

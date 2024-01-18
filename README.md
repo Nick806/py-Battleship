@@ -20,8 +20,9 @@ def take_shot(attac_table, remaining_ships):
 This function is responsible for placing the bot's ships on its own table.
 
 ```python
-def place_ships(table, ships):
+def place_ships(rows, columns, ships):
     # Your code here
+    return table
 ```
 Make sure your bot adheres to these function signatures.
 
@@ -39,7 +40,7 @@ Get creative, have fun, and share your bot creations with the community! Everyon
 ### Better readability
 - [x] Write the program in english **(most of it)**
 - [x] Separate the "main" program from the "bot" porgrams **(made the program more slow)**
-- [ ] Change the "place_ships" to return the table and get in input Rows and columns
+- [x] Change the "place_ships" to return the table and get in input Rows and columns
 ### More beautiful
 - [x] Add the title
 - [ ] Add a gui for Human input
