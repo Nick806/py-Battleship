@@ -540,7 +540,7 @@ def my_bot_3(attack_table, remaining_ships):
             
     return find_maximum_coordinates(calculate_probability_table(attack_table, remaining_ships))
 
-#circa 61.2176 mosse in 11500 partite DIVERSE
+#circa 61.3160 mosse in 30000 partite DIVERSE
 def my_bot_4(attack_table, remaining_ships):
     legal_moves = legal_moves_list(attack_table)
 
