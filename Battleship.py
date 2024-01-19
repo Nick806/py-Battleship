@@ -122,7 +122,7 @@ def play_gamemode(gamemode):
     elif gamemode == 4:
        gamemode4()
     
-    elif gamemode == 4:
+    elif gamemode == 5:
        gamemode5()
 
 def select_a_bot(bots_folder, message):
