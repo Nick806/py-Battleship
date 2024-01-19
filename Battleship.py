@@ -29,6 +29,10 @@ import os
 import importlib
 import configparser
 import keyboard
+import pygame
+import sys
+
+pygame.init()
 
 random_bot_ship_placer = "Bots\RandomBot.py"
 NUMBER_OF_DIGITS = 4
@@ -166,6 +170,110 @@ def str_to_table(string):
             table[r][c] = int(list[(r)*columns + c+2])
     
     return table
+
+
+################################################################################
+#   Pygame
+################################################################################
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+
+# Funzione per inizializzare la griglia
+def initialize_grid(rows, cols):
+    colors = [[WHITE] * cols for _ in range(rows)]
+    symbols = [['' for _ in range(cols)] for _ in range(rows)]
+    return colors, symbols
+
+def initialize_color(rows, cols):
+    colors = [[WHITE] * cols for _ in range(rows)]
+    return colors
+
+def initialize_symbols(rows, cols):
+    symbols = [['' for _ in range(cols)] for _ in range(rows)]
+    return symbols
+
+# Funzione per disegnare la griglia
+def draw_grid(rows, cols, CELL_SIZE, screen, colors, symbols, WIDTH, HEIGHT):
+    for row in range(rows):
+        for col in range(cols):
+            rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(screen, colors[row][col], rect)
+            pygame.draw.rect(screen, BLACK, rect, 1)  # Aggiungi bordo nero alle celle
+            font = pygame.font.Font(None, 36)
+            text = font.render(symbols[row][col], True, BLACK)
+            text_rect = text.get_rect(center=rect.center)
+            screen.blit(text, text_rect)
+    
+    # Disegna le linee orizzontali
+    for row in range(rows + 1):
+        pygame.draw.line(screen, BLACK, (0, row * CELL_SIZE), (WIDTH, row * CELL_SIZE), 2)
+
+    # Disegna le linee verticali
+    for col in range(cols + 1):
+        pygame.draw.line(screen, BLACK, (col * CELL_SIZE, 0), (col * CELL_SIZE, HEIGHT), 2)
+
+def get_cell_input(table, message):
+    # Dimensioni della finestra e della griglia
+    GRID_SIZE = (len(table), len(table[0]))  # Imposta il numero di righe e colonne
+    CELL_SIZE = 600 // max(GRID_SIZE)  # Adatta la dimensione delle celle in base al numero di righe o colonne
+
+    # Creazione della finestra
+    rows, cols = GRID_SIZE
+    WIDTH, HEIGHT = CELL_SIZE * cols, CELL_SIZE * rows
+    screen = pygame.display.set_mode((WIDTH, HEIGHT + 50))  # Aggiunta di spazio per la stringa
+    pygame.display.set_caption("py-Battleship")
+
+    # Inizializzazione dei colori e dei simboli per ogni cella
+    colors, symbols = initialize_grid(rows, cols)
+
+    for index1,row in enumerate(table):
+        for index2,item in enumerate(row):
+            if item == default_symbols.hit:
+                colors[index1][index2] = RED
+            elif item == default_symbols.miss:
+                colors[index1][index2] = BLUE
+            elif item == default_symbols.sunk:
+                colors[index1][index2] = GREEN
+            elif item == default_symbols.unknown:
+                colors[index1][index2] = WHITE
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # Cambia il colore e il simbolo della cella quando il mouse ci passa sopra
+                mouse_x, mouse_y = event.pos
+                col = mouse_x // CELL_SIZE
+                row = mouse_y // CELL_SIZE
+                return row+1, col+1
+            elif event.type == pygame.MOUSEMOTION:
+                # Cambia il colore e il simbolo della cella quando il mouse ci passa sopra
+                mouse_x, mouse_y = event.pos
+                col = mouse_x // CELL_SIZE
+                row = mouse_y // CELL_SIZE
+                symbols = initialize_symbols(rows, cols)
+                if 0 <= row < rows and 0 <= col < cols:
+                    symbols[row][col] = "X"
+
+        # Disegna la griglia
+        screen.fill(WHITE)
+        draw_grid(rows, cols, CELL_SIZE, screen, colors, symbols, WIDTH, HEIGHT)
+
+        # Disegna la stringa nella parte inferiore
+        font = pygame.font.Font(None, 36)
+        text = font.render(message, True, BLACK)
+        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT + 25))
+        screen.blit(text, text_rect)
+
+        # Aggiorna la finestra
+        pygame.display.flip()
+
+
 
 ################################################################################
 #   Section with basic functions
@@ -412,18 +520,18 @@ def game(attack_table, ship_positioning_table):
     - It then updates the attack table and checks for hits and sunk ships.
     - The game continues until the player wins.
     """
-    moove = 0
+    move = 0
 
     ships = SHIPS
     while True:
         print_attack(attack_table)
         
-        moove += 1
-        print("Moove number " + str(moove))
+        move += 1
+        print("Moove number " + str(move))
         remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, ships)
         print("Remaining ships: " + str(remaining_ships))
 
-        while True:
+        """while True:
             try:
                 row = int(input("Row: "))
                 column = int(input("Column: "))
@@ -431,7 +539,9 @@ def game(attack_table, ship_positioning_table):
                 print("Invalid input. Please enter an integer.")
                 continue  # Go back to the start of the loop if the input is not valid
 
-            break  # Exit the loop if the input is valid
+            break  # Exit the loop if the input is valid"""
+
+        row , column = get_cell_input(attack_table, "Remaining ships: " + str(remaining_ships))
 
         attack(attack_table, ship_positioning_table, row, column)
         check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
@@ -439,6 +549,7 @@ def game(attack_table, ship_positioning_table):
         if check_win(attack_table, ship_positioning_table):
             print_attack(attack_table)
             print("You won!")
+            get_cell_input(attack_table, "YOU WON!     Moves:" + str(move))
             return
 
 def gamemode2():
@@ -759,7 +870,13 @@ if __name__ == "__main__":
     
     play_gamemode(gamemode)
 
+    pygame.quit()
+    sys.exit()
+
     input("Pres ENTER to close....")
+
+    
+
 
 
 
