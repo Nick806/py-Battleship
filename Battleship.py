@@ -55,6 +55,7 @@ SHIPS = [2,2,2,2,3,3,3,4,4,5]
 bots_folder = "Bots"
 
 def retrive_config():
+    global SHIPS, ROWS, COLUMNS, bots_folder
     config = configparser.ConfigParser()
     config.read('config.ini', encoding='utf-8')
 
@@ -162,7 +163,7 @@ def str_to_table(string):
 
     for r in range(rows):
         for c in range(columns):
-            table[r][c] = list[(r)*columns + c+2]
+            table[r][c] = int(list[(r)*columns + c+2])
     
     return table
 
@@ -578,6 +579,9 @@ def gamemode4():
 def gamemode5():
 
     ship_positioning_table = str_to_table(input("Enter the input string for the ship positioning table:"))
+
+    print_table(ship_positioning_table)
+    print("")
 
     bot_directory =os.path.join(bots_folder, select_a_bot(bots_folder, ""))
 
