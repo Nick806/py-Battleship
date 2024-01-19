@@ -95,12 +95,13 @@ beta version                                                                    
 def input_gamemode():
     modes = """
 
-Select a game mode [1-3]:
+Select a game mode [1-5]:
 
-1) Uman gamepay whit random bot ship positioning
-2) Step-by-step Bot gameplay whit random bot ship positioning (you can choose the bot that will play)
-3) Automatic and loop Bot gamepay whit random bot ship positioning (you can choose the bot that will play)
-3) Automatic and loop Bot gamepay whit random bot ship positioning, but return the max and the min move position(you can choose the bot that will play)
+1) Uman gamepay with random bot ship positioning
+2) Step-by-step Bot gameplay with random bot ship positioning (you can choose the bot that will play)
+3) Automatic and loop Bot gamepay with random bot ship positioning (you can choose the bot that will play)
+4) Automatic and loop Bot gamepay with random bot ship positioning, but return the max and the min move position(you can choose the bot that will play)
+5) Step-by-step Bot gameplay with inputed ship positioning table (you can choose the bot that will play)
 
 Gamemode n°... """
     return input(modes)
@@ -120,6 +121,9 @@ def play_gamemode(gamemode):
 
     elif gamemode == 4:
        gamemode4()
+    
+    elif gamemode == 4:
+       gamemode5()
 
 def select_a_bot(bots_folder, message):
 
@@ -135,6 +139,32 @@ def select_a_bot(bots_folder, message):
 
     return bots[index]
 
+def table_to_str(table):
+    string = ""
+    string += str(len(table))
+    string += ";"
+    string += str(len(table[0]))
+
+    for rows in table:
+        for element in rows:
+            string += ";"
+            string += str(element)
+    
+    return string
+
+def str_to_table(string):
+    list = string.split(";")
+    
+    rows = int(list[0])
+    columns = int(list[1])
+
+    table = create_table(rows, columns, 0)
+
+    for r in range(rows):
+        for c in range(columns):
+            table[r][c] = list[(r)*columns + c+2]
+    
+    return table
 
 ################################################################################
 #   Section with basic functions
@@ -538,11 +568,49 @@ def gamemode4():
         if keyboard.is_pressed('s'):
             print("Max moves: " + str(max_number_of_moves))
             print_table(max_moves_ship_positioning_table)
+            print("Table unicode:" + table_to_str(max_moves_ship_positioning_table))
             print(" ")
             print("Min moves: " + str(min_number_of_moves))
             print_table(min_moves_ship_positioning_table)
+            print("Table unicode:" + table_to_str(min_moves_ship_positioning_table))
             break
 
+def gamemode5():
+
+    ship_positioning_table = str_to_table(input("Enter the input string for the ship positioning table:"))
+
+    bot_directory =os.path.join(bots_folder, select_a_bot(bots_folder, ""))
+
+    attack_table = create_table(ROWS, COLUMNS, "O")
+
+    bot_attack_function = get_function(bot_directory,"take_shot")
+
+    move = 0
+    while True:
+        print_attack(attack_table)
+        
+        move += 1
+        print("Moove number " + str(move))
+
+        remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, SHIPS)
+        print("Remaining ships: " + str(remaining_ships))
+
+        row, column = bot_attack_function(attack_table, remaining_ships)
+
+        print ("Row: " + str(row) + "   Column: " + str(column))
+
+        input("Press ENTER to step")
+
+        print(" ")
+
+
+        attack(attack_table, ship_positioning_table, row, column)
+        check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
+        
+        if check_win(attack_table, ship_positioning_table):
+            print_attack(attack_table)
+            print("You won! (" + str(move) + " moves)")
+            return
 
 #TODO Write this in english
         
