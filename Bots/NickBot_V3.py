@@ -25,9 +25,8 @@ def take_shot(attack_table, remaining_ships):
 
     return find_maximum_coordinates(calculate_probability_table(attack_table, remaining_ships))
 
-def place_ships(board, ships):
-    rows = len(board) - 1
-    columns = len(board[0]) - 1
+def place_ships(rows, columns, ships):
+    board = create_table(rows, columns, 0)
 
     ship_number = 0
     for length in ships:
@@ -36,20 +35,20 @@ def place_ships(board, ships):
         while not placed:
             orientation = random.choice(['horizontal', 'vertical'])
             if orientation == 'horizontal':
-                column = random.randint(0, columns - length)
-                row = random.randint(0, rows)
+                column = random.randint(0, columns-1 - length)
+                row = random.randint(0, rows-1)
                 if all(board[row][column + i] == 0 for i in range(length)):
                     for i in range(length):
                         board[row][column + i] = ship_number
                     placed = True
             else:
-                column = random.randint(0, columns)
-                row = random.randint(0, rows - length)
+                column = random.randint(0, columns-1)
+                row = random.randint(0, rows-1 - length)
                 if all(board[row + i][column] == 0 for i in range(length)):
                     for i in range(length):
                         board[row + i][column] = ship_number
                     placed = True
-
+    return board
 
 # basic functions
                     
