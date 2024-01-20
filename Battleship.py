@@ -742,22 +742,6 @@ def gioco_bot(tabella_attacco, tabella_difesa, navi, bot_directory):
     while True:
         conta_mosse += 1
 
-        """print_table(tabella_attacco)
-        print("")
-        print("Mossa numero " + str(conta_mosse))
-        print("")
-        #print_table(legal_moves_table(tabella_attacco))
-        #print("")
-        #print(legal_moves_list(tabella_attacco))
-        #print("")
-        #print(len(legal_moves_list(tabella_attacco)))
-        #print("")
-        #print(get_remaining_ships(tabella_attacco, tabella_difesa, navi))
-        #print("")
-        print_table(calculate_probability_table(tabella_attacco, get_remaining_ships(tabella_attacco, tabella_difesa, navi)))
-        print("")"""
-
-
         riga, colonna = bot_attack_function(tabella_attacco, get_remaining_ships(tabella_attacco, tabella_difesa, navi))
 
         #print(str(riga) + " " + str(colonna))
@@ -883,22 +867,24 @@ def add_line_to_file(text, full_path):
 
 if __name__ == "__main__":
         
+    
     retrive_config()
+
+    while True:
+
+        pygame.init()
+        
+        print_start()
+        
+        gamemode = input_gamemode()
+        
+        play_gamemode(gamemode)
+
+        pygame.quit()
+
+        input("Pres ENTER to close....")
+
     
-    print_start()
-    
-    gamemode = input_gamemode()
-    
-    play_gamemode(gamemode)
-
-    pygame.quit()
-    sys.exit()
-
-    input("Pres ENTER to close....")
-
-    
-
-
 
 
 
