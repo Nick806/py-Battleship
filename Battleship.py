@@ -535,6 +535,7 @@ def game(attack_table, ship_positioning_table):
             try:
                 row = int(input("Row: "))
                 column = int(input("Column: "))
+                # da consirerare anche il caso in cui il range è esterno e il numero inserito non corrisponde
             except ValueError:
                 print("Invalid input. Please enter an integer.")
                 continue  # Go back to the start of the loop if the input is not valid
