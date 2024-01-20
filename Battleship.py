@@ -551,6 +551,7 @@ def game(attack_table, ship_positioning_table):
             print_attack(attack_table)
             print("You won!")
             get_cell_input(attack_table, "YOU WON!     Moves:" + str(move))
+            print("Table: " + table_to_str(ship_positioning_table))
             return
 
 def gamemode2():
