@@ -43,7 +43,8 @@ Get creative, have fun, and share your bot creations with the community! Everyon
 - [x] Change the "place_ships" to return the table and get in input Rows and columns
 ### More beautiful
 - [x] Add the title
-- [ ] Add a gui for Human input
+- [x] Add a gui for Human input
+- [ ] Add a gui for Human input ship positioning table
 - [ ] Add the possibility to choose what data is printed
 - [ ] Add a gui, perhaps using "pygame"
 - [x] Add better input for the bots
@@ -53,7 +54,7 @@ Get creative, have fun, and share your bot creations with the community! Everyon
   - [x] bot plays, step by step, random ship positioning
   - [x] bot plays in loop (to get the medium score)
   - [x] bot plays in loop (to get the max and min score)
-  - [ ] bot plays, step by step, player ship positioning
+  - [x] bot plays, step by step, player ship positioning
 - [ ] Add config file
   - [ ] use a .env file
   - [x] Change the icons
