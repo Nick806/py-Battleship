@@ -625,6 +625,8 @@ def gamemode3():
         
         print("'S' for stop! - Average moves: " + average + "  -  Moves this game: " + str(move)+ "  -  Number of games: " + str(count_games))
         
+        add_line_to_file("Average moves: " + average + "  -  Moves this game: " + str(move)+ "  -  Number of games: " + str(count_games), "data.txt")
+        
         if keyboard.is_pressed('s'):
             break
 
@@ -855,6 +857,23 @@ def list_files(folder):
     except Exception as e:
         print(f"An error occurred: {e}")
         return []
+
+def add_line_to_file(text, full_path):
+
+    # Open the file in append mode or create the file if it doesn't exist
+    with open(full_path, 'a+') as file:
+        # Move to the beginning of the file (in case it already exists)
+        file.seek(0)
+
+        # Check if the file is empty
+        is_empty = not bool(file.read(1))
+
+        # If the file is not empty, add a new line
+        if not is_empty:
+            file.write('\n')
+
+        # Add the line with the input text
+        file.write(text)
 
 
 ################################################################################
