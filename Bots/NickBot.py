@@ -19,7 +19,7 @@ def place_ships(rows, columns, ships):
         while not placed:
             orientation = random.choice(['horizontal', 'vertical'])
             if orientation == 'horizontal':
-                column = random.randint(0, columns-1 - length)
+                column = random.randint(0, columns - length)
                 row = random.randint(0, rows-1)
                 if all(board[row][column + i] == 0 for i in range(length)):
                     for i in range(length):
@@ -27,7 +27,7 @@ def place_ships(rows, columns, ships):
                     placed = True
             else:
                 column = random.randint(0, columns-1)
-                row = random.randint(0, rows-1 - length)
+                row = random.randint(0, rows - length)
                 if all(board[row + i][column] == 0 for i in range(length)):
                     for i in range(length):
                         board[row + i][column] = ship_number
