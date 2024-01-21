@@ -31,6 +31,7 @@ import configparser
 import keyboard
 import pygame
 import sys
+from dotenv import load_dotenv
 
 pygame.init()
 
@@ -60,20 +61,25 @@ bots_folder = "Bots"
 
 def retrive_config():
     global SHIPS, ROWS, COLUMNS, bots_folder
-    config = configparser.ConfigParser()
-    config.read('config.ini', encoding='utf-8')
 
-    config_symbols.unknown = str(config.get('symbols', 'unknown'))
-    config_symbols.miss = str(config.get('symbols', 'miss'))
-    config_symbols.hit = str(config.get('symbols', 'hit'))
-    config_symbols.sunk = str(config.get('symbols', 'sunk'))
+    # Load environment variables from .env file
+    load_dotenv("config.env")
 
-    SHIPS = list(map(int, config.get('game', 'ships').split(',')))
-    ROWS = int(config.get('game', 'rows'))
-    COLUMNS = int(config.get('game', 'columns'))
+    # Access variables using os.getenv
+    ROWS = int(os.getenv("rows"))
+    COLUMNS = int(os.getenv("columns"))
+    bots_folder = os.getenv("bots_folder")
+    SHIPS = list(map(int, os.getenv("ships").split(',')))
 
-    bots_folder = config.get('settings', 'bots_folder')
+    print(type(ROWS))
 
+    config_symbols.unknown = str(os.getenv("symbol_unknown"))
+    config_symbols.miss = str(os.getenv("symbol_miss"))
+    config_symbols.hit = str(os.getenv("symbol_hit"))
+    config_symbols.sunk = str(os.getenv("symbol_sunk"))
+
+    print(config_symbols.miss)
+    print(config_symbols.hit)
 
 ################################################################################
 #   GUI functions

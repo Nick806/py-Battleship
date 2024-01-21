@@ -56,7 +56,7 @@ Get creative, have fun, and share your bot creations with the community! Everyon
   - [x] bot plays in loop (to get the max and min score)
   - [x] bot plays, step by step, player ship positioning
 - [ ] Add config file
-  - [ ] use a .env file
+  - [x] use a .env file
   - [x] Change the icons
   - [x] some default directory and bots
   - [x] number of rows and columns of the game
