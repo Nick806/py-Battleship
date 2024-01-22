@@ -45,6 +45,7 @@ Get creative, have fun, and share your bot creations with the community! Everyon
   - [ ] class for the attack board
   - [ ] class for the shi_positioning_board
   - [ ] class for an entire game
+- [ ] Add a file for the basic function and than import it
 ### More beautiful
 - [x] Add the title
 - [x] Add a gui for Human input
