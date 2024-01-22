@@ -235,8 +235,6 @@ class Game:
         ship_i1= ship["row"]-1
         ship_i2 = ship["column"]-1
 
-        print (ship)
-
         if ship["orientation"] == "vertical":
             for cont in range(ship["length"]):
                 if self.attack_board.board[ship_i1+cont][ship_i2] == default_symbols.unknown: return "hit" #still not sunk
