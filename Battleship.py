@@ -157,7 +157,7 @@ class Ship_positioning_board:
             row = index1 + 1
             column = index2 + 1
 
-            if self.board[index1+1][index2] == num+1: orientation = "horizontal"
+            if self.board[index1][index2+1] == num+1: orientation = "horizontal"
             else: orientation = "vertical"
 
             ships_data.append({"length":length, "orientation":orientation, "row":row, "column":column, "number":num+1})
@@ -220,7 +220,7 @@ class Game:
         row -= 1
         column -= 1
 
-        if self.attack_board.board[row][column] == default_symbols.unknown:
+        if self.attack_board.board[row][column] != default_symbols.unknown:
             return "illegal" #illegal move
 
         ship_number = self.ship_positioning_board.board[row][column]
@@ -232,22 +232,23 @@ class Game:
         self.attack_board.board[row][column] = default_symbols.hit
 
         ship = self.ship_positioning_board.ships_data[ship_number-1]
+        ship_i1= ship["row"]-1
+        ship_i2 = ship["column"]-1
 
-        ship["row"] = ship["row"]-1
-        ship["column"] = ship["column"]-1
+        print (ship)
 
-        if ship["orientation"] == "horizzontal":
+        if ship["orientation"] == "vertical":
             for cont in range(ship["length"]):
-                if self.attack_board.board[ship["row"]+cont][ship["column"]] == default_symbols.unknown: return "hit" #still not sunk
+                if self.attack_board.board[ship_i1+cont][ship_i2] == default_symbols.unknown: return "hit" #still not sunk
             for cont in range(ship["length"]):
-                self.attack_board.board[ship["row"]+cont][ship["column"]] = default_symbols.sunk
+                self.attack_board.board[ship_i1+cont][ship_i2] = default_symbols.sunk
         else:
             for cont in range(ship["length"]):
-                if self.attack_board.board[ship["row"]][ship["column"]+cont] == default_symbols.unknown: return "hit" #still not sunk
+                if self.attack_board.board[ship_i1][ship_i2+cont] == default_symbols.unknown: return "hit" #still not sunk
             for cont in range(ship["length"]):
-                self.attack_board.board[ship["row"]][ship["column"]+cont] = default_symbols.sunk
+                self.attack_board.board[ship_i1][ship_i2+cont] = default_symbols.sunk
             
-        self.attack_board.remaining_ships.remove(ship_number)
+        self.attack_board.remaining_ships.remove(ship["length"])
 
         if len(self.attack_board.remaining_ships) == 0:
             return "won" #won, end of the game
@@ -693,8 +694,25 @@ def max_possible_combination(table, ships):
 ################################################################################
 
 def gamemode1():
-    ship_positioning_table = get_function(random_bot_ship_placer,"place_ships")(ROWS, COLUMNS, SHIPS)
-    game(create_table(ROWS, COLUMNS, "O"), ship_positioning_table)
+    global ROWS, COLUMNS, SHIPS, default_symbols
+
+    ship_positioning_table = Ship_positioning_board(create_table(ROWS,COLUMNS,0))
+    ship_positioning_table.generate_random_board(SHIPS)
+
+    attack_table = Attack_board(create_table(ROWS,COLUMNS,default_symbols.unknown),SHIPS)
+
+    game = Game(attack_table, ship_positioning_table)
+
+    row, column = get_cell_input(game.attack_board.board, "Remaining ships: " + str(game.attack_board.remaining_ships))
+    out = game.attack(row, column)
+
+    while out != "won":
+        print(game.attack_board)
+        print(game.ship_positioning_board)
+        row, column = get_cell_input(game.attack_board.board, "Remaining ships: " + str(game.attack_board.remaining_ships))
+        print(f"{row} - {column}")
+        out = game.attack(row, column)
+        print(out)
 
 def game(attack_table, ship_positioning_table):
     """
@@ -1054,6 +1072,7 @@ def add_line_to_file(text, full_path):
 #   MAIN
 ################################################################################
 
+"""
 attack_board = Attack_board(create_table(ROWS, COLUMNS, "O"),[5])
 
 print_table(attack_board.board)
@@ -1068,12 +1087,12 @@ print(ship_positioning_board)
 ship_positioning_board.board[3][4] = 3
 print(ship_positioning_board)
 ship_positioning_board.generate_random_board(SHIPS)
-print(ship_positioning_board)
+print(ship_positioning_board)"""
 
 if __name__ == "__main__":
         
     
-    """
+    
     retrive_config()
 
     while True:
@@ -1090,7 +1109,7 @@ if __name__ == "__main__":
 
         input("Pres ENTER to close....")
 
-        """
+        
 
     
 
