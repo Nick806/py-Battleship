@@ -34,7 +34,7 @@ from dotenv import load_dotenv
 
 pygame.init()
 
-random_bot_ship_placer = "Bots\RandomBot.py"
+random_bot_ship_placer = "Bots\\RandomBot.py"
 NUMBER_OF_DIGITS = 4
 
 ################################################################################
@@ -86,7 +86,80 @@ def retrive_config():
 ################################################################################
 
 class Attack_board:
-    def __init__(self,):
+    def __init__(self, board, remaining_ships):
+        self.board = board
+        self.rows = self.Rows()
+        self.columns = self.Columns()
+        self.remaining_ships = remaining_ships
+    
+    def Rows(self):
+        return len(self.board)
+    
+    def Columns(self):
+        return len(self.board[0])
+
+
+class Ship_positioning_board:
+    def __init__(self, board):
+        self.board = board
+        self.rows = self.Rows()
+        self.columns = self.Columns()
+        self.ships = self.get_ships()
+    
+    def Rows(self):
+        return len(self.board)
+    
+    def Columns(self):
+        return len(self.board[0])
+    
+    def get_ships(self):
+        """
+        Retrieves the number of ships in the table.
+
+        Parameters:
+        - table (list): The table representing the positions of ships, where 0 denotes an empty position.
+
+        Returns:
+        - list: A list containing the number of ships in the table.
+        """
+        number_of_ships = max(max(self, key=max))
+        ship_counts = []
+
+        for num in range(number_of_ships):
+            ship_counts.append(count_element_in_table(self, num + 1))
+
+        return ship_counts
+    
+    def clear_board(self):
+        self.board = [[0 for j in range(self.columns)] for i in range(self.rows)]
+
+    def generate_random_board(self, ships):
+        self.clear_board()
+
+        ship_number = 0
+        for length in ships:
+            ship_number += 1
+            placed = False
+            while not placed:
+                orientation = random.choice(['horizontal', 'vertical'])
+                if orientation == 'horizontal':
+                    column = random.randint(0, self.columns - length)
+                    row = random.randint(0, self.rows-1)
+                    if all(self.board[row][column + i] == 0 for i in range(length)):
+                        for i in range(length):
+                            self.board[row][column + i] = ship_number
+                        placed = True
+                else:
+                    column = random.randint(0, self.columns-1)
+                    row = random.randint(0, self.rows - length)
+                    if all(self.board[row + i][column] == 0 for i in range(length)):
+                        for i in range(length):
+                            self.board[row + i][column] = ship_number
+                        placed = True
+
+    
+
+
 
 
 ################################################################################
@@ -95,17 +168,17 @@ class Attack_board:
 
 def print_start():
     name = """
-                            $$$$$$$\             $$\     $$\     $$\                     $$\       $$\           
-                            $$  __$$\            $$ |    $$ |    $$ |                    $$ |      \__|          
- $$$$$$\  $$\   $$\         $$ |  $$ | $$$$$$\ $$$$$$\ $$$$$$\   $$ | $$$$$$\   $$$$$$$\ $$$$$$$\  $$\  $$$$$$\  
-$$  __$$\ $$ |  $$ |$$$$$$\ $$$$$$$\ | \____$$\\\_$$  _|\_$$  _|  $$ |$$  __$$\ $$  _____|$$  __$$\ $$ |$$  __$$\ 
-$$ /  $$ |$$ |  $$ |\______|$$  __$$\  $$$$$$$ | $$ |    $$ |    $$ |$$$$$$$$ |\$$$$$$\  $$ |  $$ |$$ |$$ /  $$ |
-$$ |  $$ |$$ |  $$ |        $$ |  $$ |$$  __$$ | $$ |$$\ $$ |$$\ $$ |$$   ____| \____$$\ $$ |  $$ |$$ |$$ |  $$ |
-$$$$$$$  |\$$$$$$$ |        $$$$$$$  |\$$$$$$$ | \$$$$/  \$$$$  |$$ |\$$$$$$$\ $$$$$$$  |$$ |  $$ |$$ |$$$$$$$  |
-$$  ____/  \____$$ |        \_______/  \_______|  \____/  \____/ \__| \_______|\_______/ \__|  \__|\__|$$  ____/ 
-$$ |      $$\   $$ |                                                                                   $$ |      
-$$ |      \$$$$$$  |                                                                                   $$ |      
-\__|       \______/                                                                                    \__|      
+                            $$$$$$$\\             $$\\     $$\\     $$\\                     $$\\       $$\\           
+                            $$  __$$\\            $$ |    $$ |    $$ |                    $$ |      \\__|          
+ $$$$$$\\  $$\\   $$\\         $$ |  $$ | $$$$$$\\ $$$$$$\\ $$$$$$\\   $$ | $$$$$$\\   $$$$$$$\\ $$$$$$$\\  $$\\  $$$$$$\\  
+$$  __$$\\ $$ |  $$ |$$$$$$\\ $$$$$$$\\ | \\____$$\\\\_$$  _|\\_$$  _|  $$ |$$  __$$\\ $$  _____|$$  __$$\\ $$ |$$  __$$\\ 
+$$ /  $$ |$$ |  $$ |\\______|$$  __$$\\  $$$$$$$ | $$ |    $$ |    $$ |$$$$$$$$ |\\$$$$$$\\  $$ |  $$ |$$ |$$ /  $$ |
+$$ |  $$ |$$ |  $$ |        $$ |  $$ |$$  __$$ | $$ |$$\\ $$ |$$\\ $$ |$$   ____| \\____$$\\ $$ |  $$ |$$ |$$ |  $$ |
+$$$$$$$  |\\$$$$$$$ |        $$$$$$$  |\\$$$$$$$ | \\$$$$/  \\$$$$  |$$ |\\$$$$$$$\\ $$$$$$$  |$$ |  $$ |$$ |$$$$$$$  |
+$$  ____/  \\____$$ |        \\_______/  \\_______|  \\____/  \\____/ \\__| \\_______|\\_______/ \\__|  \\__|\\__|$$  ____/ 
+$$ |      $$\\   $$ |                                                                                   $$ |      
+$$ |      \\$$$$$$  |                                                                                   $$ |      
+\\__|       \\______/                                                                                    \\__|      
 
 beta version                                                                                        by Nick806
 """
@@ -879,9 +952,16 @@ def add_line_to_file(text, full_path):
 #   MAIN
 ################################################################################
 
+attack_board = Attack_board(create_table(ROWS, COLUMNS, "O"))
+
+print_table(attack_board.board)
+print(attack_board.rows)
+print(attack_board.columns)
+
 if __name__ == "__main__":
         
     
+    """
     retrive_config()
 
     while True:
@@ -897,6 +977,8 @@ if __name__ == "__main__":
         pygame.quit()
 
         input("Pres ENTER to close....")
+
+        """
 
     
 
