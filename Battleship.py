@@ -70,15 +70,10 @@ def retrive_config():
     bots_folder = os.getenv("bots_folder")
     SHIPS = list(map(int, os.getenv("ships").split(',')))
 
-    print(type(ROWS))
-
     config_symbols.unknown = str(os.getenv("symbol_unknown"))
     config_symbols.miss = str(os.getenv("symbol_miss"))
     config_symbols.hit = str(os.getenv("symbol_hit"))
     config_symbols.sunk = str(os.getenv("symbol_sunk"))
-
-    print(config_symbols.miss)
-    print(config_symbols.hit)
 
 
 ################################################################################
@@ -97,6 +92,24 @@ class Attack_board:
     
     def Columns(self):
         return len(self.board[0])
+    
+    def __str__(self) -> str:
+        string = ""
+        for row in self.board:
+            for item in row:
+                if item == default_symbols.hit:
+                    string += (config_symbols.hit + " ")
+                elif item == default_symbols.miss:
+                    string += (config_symbols.miss + " ")
+                elif item == default_symbols.sunk:
+                    string += (config_symbols.sunk + " ")
+                elif item == default_symbols.unknown:
+                    string += (config_symbols.unknown + " ")
+                else:
+                    string += (item + " ")
+            string += "\n"
+        string += f"Remaining ships: {self.remaining_ships}"
+        return string
 
 
 class Ship_positioning_board:
@@ -105,6 +118,7 @@ class Ship_positioning_board:
         self.rows = self.Rows()
         self.columns = self.Columns()
         self.ships = self.get_ships()
+        self.ships_data = self.get_ships_data()
     
     def Rows(self):
         return len(self.board)
@@ -122,19 +136,52 @@ class Ship_positioning_board:
         Returns:
         - list: A list containing the number of ships in the table.
         """
-        number_of_ships = max(max(self, key=max))
+        number_of_ships = max(max(self.board, key=max))
         ship_counts = []
 
         for num in range(number_of_ships):
-            ship_counts.append(count_element_in_table(self, num + 1))
-
+            ship = count_element_in_table(self.board, num + 1)
+            if ship != 0 : ship_counts.append(ship)
         return ship_counts
     
+    def get_ships_data(self):
+        number_of_ships = max(max(self.board, key=max))
+        ships_data = [] # [orientation, length, row, column]
+
+        for num in range(number_of_ships):
+
+            length = count_element_in_table(self.board, num + 1)
+            if length == 0: continue #salta questa nave perchè non esiste
+
+            index1, index2 = get_index_of_element_in_table(self.board, num+1)
+            row = index1 + 1
+            column = index2 + 1
+
+            if self.board[index1+1][index2] == num+1: orientation = "horizontal"
+            else: orientation = "vertical"
+
+            ships_data.append({"length":length, "orientation":orientation, "row":row, "column":column, "number":num+1})
+
+        return ships_data
+    
+    def __str__(self) -> str:
+        string = ""
+        for row in self.board:
+            for item in row:
+                string += (str(item) + " ")
+            string += "\n"
+        string += f"Ships: {self.ships}"
+        return string
+
     def clear_board(self):
         self.board = [[0 for j in range(self.columns)] for i in range(self.rows)]
+        self.ships = []
+        self.ships_data = []
 
     def generate_random_board(self, ships):
         self.clear_board()
+
+        self.ships = ships
 
         ship_number = 0
         for length in ships:
@@ -156,9 +203,58 @@ class Ship_positioning_board:
                         for i in range(length):
                             self.board[row + i][column] = ship_number
                         placed = True
+            self.ships_data.append({"length":length, "orientation":orientation, "row":row+1, "column":column+1, "number":ship_number})
 
+
+class Game:
+    def __init__(self, attack_board, ship_positioning_board):
+        self.attack_board = attack_board
+        self.ship_positioning_board = ship_positioning_board
+        self.moves = 0
+        self.moves_list = []
     
+    def attack(self, row, column):
+        self.moves += 1
+        self.moves_list.append([row, column])
 
+        row -= 1
+        column -= 1
+
+        if self.attack_board.board[row][column] == default_symbols.unknown:
+            return "illegal" #illegal move
+
+        ship_number = self.ship_positioning_board.board[row][column]
+
+        if ship_number == 0:
+            self.attack_board.board[row][column] = default_symbols.miss
+            return "miss" #miss
+        
+        self.attack_board.board[row][column] = default_symbols.hit
+
+        ship = self.ship_positioning_board.ships_data[ship_number-1]
+
+        ship["row"] = ship["row"]-1
+        ship["column"] = ship["column"]-1
+
+        if ship["orientation"] == "horizzontal":
+            for cont in range(ship["length"]):
+                if self.attack_board.board[ship["row"]+cont][ship["column"]] == default_symbols.unknown: return "hit" #still not sunk
+            for cont in range(ship["length"]):
+                self.attack_board.board[ship["row"]+cont][ship["column"]] = default_symbols.sunk
+        else:
+            for cont in range(ship["length"]):
+                if self.attack_board.board[ship["row"]][ship["column"]+cont] == default_symbols.unknown: return "hit" #still not sunk
+            for cont in range(ship["length"]):
+                self.attack_board.board[ship["row"]][ship["column"]+cont] = default_symbols.sunk
+            
+        self.attack_board.remaining_ships.remove(ship_number)
+
+        if len(self.attack_board.remaining_ships) == 0:
+            return "won" #won, end of the game
+        
+        return "sunk" #sunk but there are other ships
+        
+        
 
 
 
@@ -418,6 +514,12 @@ def print_attack(table):
             elif item == default_symbols.unknown:
                 print(config_symbols.unknown, end=" ")
         print()
+
+def get_index_of_element_in_table(table, element):
+    for i1,x in enumerate(table):
+        for i2,y in enumerate(x):
+            if y == element:
+                return i1, i2
 
 def count_element_in_table(table, element):
     """
@@ -952,11 +1054,21 @@ def add_line_to_file(text, full_path):
 #   MAIN
 ################################################################################
 
-attack_board = Attack_board(create_table(ROWS, COLUMNS, "O"))
+attack_board = Attack_board(create_table(ROWS, COLUMNS, "O"),[5])
 
 print_table(attack_board.board)
 print(attack_board.rows)
 print(attack_board.columns)
+print(attack_board)
+retrive_config()
+print(attack_board)
+
+ship_positioning_board = Ship_positioning_board(create_table(ROWS, COLUMNS, 0))
+print(ship_positioning_board)
+ship_positioning_board.board[3][4] = 3
+print(ship_positioning_board)
+ship_positioning_board.generate_random_board(SHIPS)
+print(ship_positioning_board)
 
 if __name__ == "__main__":
         
