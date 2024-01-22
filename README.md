@@ -41,6 +41,10 @@ Get creative, have fun, and share your bot creations with the community! Everyon
 - [x] Write the program in english **(most of it)**
 - [x] Separate the "main" program from the "bot" porgrams **(made the program more slow)**
 - [x] Change the "place_ships" to return the table and get in input Rows and columns
+- [ ] Use classes
+  - [ ] class for the attack board
+  - [ ] class for the shi_positioning_board
+  - [ ] class for an entire game
 ### More beautiful
 - [x] Add the title
 - [x] Add a gui for Human input
