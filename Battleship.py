@@ -27,7 +27,6 @@ import random
 import time
 import os
 import importlib
-import configparser
 import keyboard
 import pygame
 import sys
@@ -80,6 +79,15 @@ def retrive_config():
 
     print(config_symbols.miss)
     print(config_symbols.hit)
+
+
+################################################################################
+#   Classes
+################################################################################
+
+class Attack_board:
+    def __init__(self,):
+
 
 ################################################################################
 #   GUI functions
