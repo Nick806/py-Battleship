@@ -119,6 +119,7 @@ class Ship_positioning_board:
         self.columns = self.Columns()
         self.ships = self.get_ships()
         self.ships_data = self.get_ships_data()
+        self.unicode = self.get_unicode()
     
     def Rows(self):
         return len(self.board)
@@ -177,6 +178,7 @@ class Ship_positioning_board:
         self.board = [[0 for j in range(self.columns)] for i in range(self.rows)]
         self.ships = []
         self.ships_data = []
+        self.unicode = self.get_unicode()
 
     def generate_random_board(self, ships):
         self.clear_board()
@@ -204,7 +206,20 @@ class Ship_positioning_board:
                             self.board[row + i][column] = ship_number
                         placed = True
             self.ships_data.append({"length":length, "orientation":orientation, "row":row+1, "column":column+1, "number":ship_number})
+        self.unicode = self.get_unicode()
+    
+    def get_unicode(self):
+        string = ""
+        string += str(self.rows)
+        string += ";"
+        string += str(self.columns)
 
+        for row in self.board:
+            for element in row:
+                string += ";"
+                string += str(element)
+        
+        return string
 
 class Game:
     def __init__(self, attack_board, ship_positioning_board):
@@ -253,8 +268,6 @@ class Game:
         
         return "sunk" #sunk but there are other ships
         
-        
-
 
 
 ################################################################################
@@ -701,16 +714,17 @@ def gamemode1():
 
     game = Game(attack_table, ship_positioning_table)
 
-    row, column = get_cell_input(game.attack_board.board, "Remaining ships: " + str(game.attack_board.remaining_ships))
-    out = game.attack(row, column)
-
+    out = ""
     while out != "won":
-        print(game.attack_board)
-        print(game.ship_positioning_board)
         row, column = get_cell_input(game.attack_board.board, "Remaining ships: " + str(game.attack_board.remaining_ships))
-        print(f"{row} - {column}")
         out = game.attack(row, column)
+        print(f"Attacked at row:{row} and column:{column}")
+        print(game.attack_board)
         print(out)
+        print()
+    
+    print(f"Table: {game.ship_positioning_board.unicode}")
+
 
 def game(attack_table, ship_positioning_table):
     """
