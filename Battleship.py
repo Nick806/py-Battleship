@@ -111,7 +111,6 @@ class Attack_board:
         string += f"Remaining ships: {self.remaining_ships}"
         return string
 
-
 class Ship_positioning_board:
     def __init__(self, board):
         self.board = board
