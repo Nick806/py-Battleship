@@ -158,7 +158,7 @@ class Ship_positioning_board:
             row = index1 + 1
             column = index2 + 1
 
-            if self.board[index1][index2+1] == num+1: orientation = "horizontal"
+            if column<=self.columns or self.board[index1][index2+1] == num+1: orientation = "horizontal"
             else: orientation = "vertical"
 
             ships_data.append({"length":length, "orientation":orientation, "row":row, "column":column, "number":num+1})
@@ -718,7 +718,7 @@ def gamemode1():
     while out != "won":
         row, column = get_cell_input(game.attack_board.board, "Remaining ships: " + str(game.attack_board.remaining_ships))
         out = game.attack(row, column)
-        print(f"Attacked at row:{row} and column:{column}")
+        print(f"Attacked at row:{row} and column:{column} - Move number: {game.moves}")
         print(game.attack_board)
         print(out)
         print()
@@ -774,40 +774,29 @@ def game(attack_table, ship_positioning_table):
             return
 
 def gamemode2():
-    ship_positioning_table = get_function(random_bot_ship_placer,"place_ships")(ROWS, COLUMNS, SHIPS)
-
     bot_directory =os.path.join(bots_folder, select_a_bot(bots_folder, ""))
 
-    attack_table = create_table(ROWS, COLUMNS, "O")
+    ship_positioning_table = Ship_positioning_board(create_table(ROWS,COLUMNS,0))
+    ship_positioning_table.generate_random_board(SHIPS)
+
+    attack_table = Attack_board(create_table(ROWS,COLUMNS,default_symbols.unknown),SHIPS)
 
     bot_attack_function = get_function(bot_directory,"take_shot")
 
-    move = 0
-    while True:
-        print_attack(attack_table)
-        
-        move += 1
-        print("Moove number " + str(move))
+    game = Game(attack_table, ship_positioning_table)
 
-        remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, SHIPS)
-        print("Remaining ships: " + str(remaining_ships))
-
-        row, column = bot_attack_function(attack_table, remaining_ships)
-
-        print ("Row: " + str(row) + "   Column: " + str(column))
-
+    out = ""
+    while out != "won":
+        row, column = bot_attack_function(game.attack_board.board, game.attack_board.remaining_ships)
+        out = game.attack(row, column)
+        print(f"Attacked at row:{row} and column:{column} - Move number: {game.moves}")
+        print(game.attack_board)
+        print(out)
         input("Press ENTER to step")
+        print()
+    
+    print(f"Table: {game.ship_positioning_board.unicode}")
 
-        print(" ")
-
-
-        attack(attack_table, ship_positioning_table, row, column)
-        check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
-        
-        if check_win(attack_table, ship_positioning_table):
-            print_attack(attack_table)
-            print("You won! (" + str(move) + " moves)")
-            return
 
 def gamemode3():
     count_games = 0
@@ -911,44 +900,28 @@ def gamemode4():
             break
 
 def gamemode5():
-
-    ship_positioning_table = str_to_table(input("Enter the input string for the ship positioning table:"))
-
-    print_table(ship_positioning_table)
-    print("")
+    ship_positioning_table = Ship_positioning_board(str_to_table(input("Enter the input string for the ship positioning table:")))
+    print(ship_positioning_table)
+    print()
+    attack_table = Attack_board(create_table(ROWS,COLUMNS,default_symbols.unknown),SHIPS)
 
     bot_directory =os.path.join(bots_folder, select_a_bot(bots_folder, ""))
-
-    attack_table = create_table(ROWS, COLUMNS, "O")
-
     bot_attack_function = get_function(bot_directory,"take_shot")
 
-    move = 0
-    while True:
-        print_attack(attack_table)
-        
-        move += 1
-        print("Moove number " + str(move))
+    game = Game(attack_table, ship_positioning_table)
 
-        remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, SHIPS)
-        print("Remaining ships: " + str(remaining_ships))
-
-        row, column = bot_attack_function(attack_table, remaining_ships)
-
-        print ("Row: " + str(row) + "   Column: " + str(column))
-
+    out = ""
+    while out != "won":
+        row, column = bot_attack_function(game.attack_board.board, game.attack_board.remaining_ships)
+        out = game.attack(row, column)
+        print(f"Attacked at row:{row} and column:{column} - Move number: {game.moves}")
+        print(game.attack_board)
+        print(out)
         input("Press ENTER to step")
+        print()
+    
+    print(f"Table: {game.ship_positioning_board.unicode}")
 
-        print(" ")
-
-
-        attack(attack_table, ship_positioning_table, row, column)
-        check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
-        
-        if check_win(attack_table, ship_positioning_table):
-            print_attack(attack_table)
-            print("You won! (" + str(move) + " moves)")
-            return
 
 #TODO Write this in english
         
