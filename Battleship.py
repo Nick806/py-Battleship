@@ -158,7 +158,7 @@ class Ship_positioning_board:
             row = index1 + 1
             column = index2 + 1
 
-            if column<=self.columns or self.board[index1][index2+1] == num+1: orientation = "horizontal"
+            if column != self.columns and self.board[index1][index2+1] == num+1: orientation = "horizontal"
             else: orientation = "vertical"
 
             ships_data.append({"length":length, "orientation":orientation, "row":row, "column":column, "number":num+1})
@@ -303,8 +303,21 @@ Select a game mode [1-5]:
 4) Automatic and loop Bot gamepay with random bot ship positioning, but return the max and the min move position(you can choose the bot that will play)
 5) Step-by-step Bot gameplay with inputed ship positioning table (you can choose the bot that will play)
 
-Gamemode n°... """
-    return input(modes)
+"""
+    print (modes)
+
+    while True:
+        try:
+            mode = int(input("Gamemode n°... "))
+            if mode<=5 and mode>=1:
+                break
+            else:
+                print("Input is not valid - Enter a valid number")
+
+        except:
+            print("Input is not valid - Enter a number")
+
+    return mode
 
 def play_gamemode(gamemode):
 
