@@ -27,7 +27,6 @@ import random
 import time
 import os
 import importlib
-import configparser
 import keyboard
 import pygame
 import sys
@@ -35,7 +34,7 @@ from dotenv import load_dotenv
 
 pygame.init()
 
-random_bot_ship_placer = "Bots\RandomBot.py"
+random_bot_ship_placer = "Bots\\RandomBot.py"
 NUMBER_OF_DIGITS = 4
 
 ################################################################################
@@ -71,15 +70,204 @@ def retrive_config():
     bots_folder = os.getenv("bots_folder")
     SHIPS = list(map(int, os.getenv("ships").split(',')))
 
-    print(type(ROWS))
-
     config_symbols.unknown = str(os.getenv("symbol_unknown"))
     config_symbols.miss = str(os.getenv("symbol_miss"))
     config_symbols.hit = str(os.getenv("symbol_hit"))
     config_symbols.sunk = str(os.getenv("symbol_sunk"))
 
-    print(config_symbols.miss)
-    print(config_symbols.hit)
+
+################################################################################
+#   Classes
+################################################################################
+
+class Attack_board:
+    def __init__(self, board, remaining_ships):
+        self.board = board
+        self.rows = self.Rows()
+        self.columns = self.Columns()
+        self.remaining_ships = remaining_ships
+    
+    def Rows(self):
+        return len(self.board)
+    
+    def Columns(self):
+        return len(self.board[0])
+    
+    def __str__(self) -> str:
+        string = ""
+        for row in self.board:
+            for item in row:
+                if item == default_symbols.hit:
+                    string += (config_symbols.hit + " ")
+                elif item == default_symbols.miss:
+                    string += (config_symbols.miss + " ")
+                elif item == default_symbols.sunk:
+                    string += (config_symbols.sunk + " ")
+                elif item == default_symbols.unknown:
+                    string += (config_symbols.unknown + " ")
+                else:
+                    string += (item + " ")
+            string += "\n"
+        string += f"Remaining ships: {self.remaining_ships}"
+        return string
+
+class Ship_positioning_board:
+    def __init__(self, board):
+        self.board = board
+        self.rows = self.Rows()
+        self.columns = self.Columns()
+        self.ships = self.get_ships()
+        self.ships_data = self.get_ships_data()
+        self.unicode = self.get_unicode()
+    
+    def Rows(self):
+        return len(self.board)
+    
+    def Columns(self):
+        return len(self.board[0])
+    
+    def get_ships(self):
+        """
+        Retrieves the number of ships in the table.
+
+        Parameters:
+        - table (list): The table representing the positions of ships, where 0 denotes an empty position.
+
+        Returns:
+        - list: A list containing the number of ships in the table.
+        """
+        number_of_ships = max(max(self.board, key=max))
+        ship_counts = []
+
+        for num in range(number_of_ships):
+            ship = count_element_in_table(self.board, num + 1)
+            if ship != 0 : ship_counts.append(ship)
+        return ship_counts
+    
+    def get_ships_data(self):
+        number_of_ships = max(max(self.board, key=max))
+        ships_data = [] # [orientation, length, row, column]
+
+        for num in range(number_of_ships):
+
+            length = count_element_in_table(self.board, num + 1)
+            if length == 0: continue #salta questa nave perchè non esiste
+
+            index1, index2 = get_index_of_element_in_table(self.board, num+1)
+            row = index1 + 1
+            column = index2 + 1
+
+            if column != self.columns and self.board[index1][index2+1] == num+1: orientation = "horizontal"
+            else: orientation = "vertical"
+
+            ships_data.append({"length":length, "orientation":orientation, "row":row, "column":column, "number":num+1})
+
+        return ships_data
+    
+    def __str__(self) -> str:
+        string = ""
+        for row in self.board:
+            for item in row:
+                string += (str(item) + " ")
+            string += "\n"
+        string += f"Ships: {self.ships}"
+        return string
+
+    def clear_board(self):
+        self.board = [[0 for j in range(self.columns)] for i in range(self.rows)]
+        self.ships = []
+        self.ships_data = []
+        self.unicode = self.get_unicode()
+
+    def generate_random_board(self, ships):
+        self.clear_board()
+
+        self.ships = ships
+
+        ship_number = 0
+        for length in ships:
+            ship_number += 1
+            placed = False
+            while not placed:
+                orientation = random.choice(['horizontal', 'vertical'])
+                if orientation == 'horizontal':
+                    column = random.randint(0, self.columns - length)
+                    row = random.randint(0, self.rows-1)
+                    if all(self.board[row][column + i] == 0 for i in range(length)):
+                        for i in range(length):
+                            self.board[row][column + i] = ship_number
+                        placed = True
+                else:
+                    column = random.randint(0, self.columns-1)
+                    row = random.randint(0, self.rows - length)
+                    if all(self.board[row + i][column] == 0 for i in range(length)):
+                        for i in range(length):
+                            self.board[row + i][column] = ship_number
+                        placed = True
+            self.ships_data.append({"length":length, "orientation":orientation, "row":row+1, "column":column+1, "number":ship_number})
+        self.unicode = self.get_unicode()
+    
+    def get_unicode(self):
+        string = ""
+        string += str(self.rows)
+        string += ";"
+        string += str(self.columns)
+
+        for row in self.board:
+            for element in row:
+                string += ";"
+                string += str(element)
+        
+        return string
+
+class Game:
+    def __init__(self, attack_board, ship_positioning_board):
+        self.attack_board = attack_board
+        self.ship_positioning_board = ship_positioning_board
+        self.moves = 0
+        self.moves_list = []
+    
+    def attack(self, row, column):
+        self.moves += 1
+        self.moves_list.append([row, column])
+
+        row -= 1
+        column -= 1
+
+        if self.attack_board.board[row][column] != default_symbols.unknown:
+            return "illegal" #illegal move
+
+        ship_number = self.ship_positioning_board.board[row][column]
+
+        if ship_number == 0:
+            self.attack_board.board[row][column] = default_symbols.miss
+            return "miss" #miss
+        
+        self.attack_board.board[row][column] = default_symbols.hit
+
+        ship = self.ship_positioning_board.ships_data[ship_number-1]
+        ship_i1= ship["row"]-1
+        ship_i2 = ship["column"]-1
+
+        if ship["orientation"] == "vertical":
+            for cont in range(ship["length"]):
+                if self.attack_board.board[ship_i1+cont][ship_i2] == default_symbols.unknown: return "hit" #still not sunk
+            for cont in range(ship["length"]):
+                self.attack_board.board[ship_i1+cont][ship_i2] = default_symbols.sunk
+        else:
+            for cont in range(ship["length"]):
+                if self.attack_board.board[ship_i1][ship_i2+cont] == default_symbols.unknown: return "hit" #still not sunk
+            for cont in range(ship["length"]):
+                self.attack_board.board[ship_i1][ship_i2+cont] = default_symbols.sunk
+            
+        self.attack_board.remaining_ships.remove(ship["length"])
+
+        if len(self.attack_board.remaining_ships) == 0:
+            return "won" #won, end of the game
+        
+        return "sunk" #sunk but there are other ships
+        
+
 
 ################################################################################
 #   GUI functions
@@ -87,17 +275,17 @@ def retrive_config():
 
 def print_start():
     name = """
-                            $$$$$$$\             $$\     $$\     $$\                     $$\       $$\           
-                            $$  __$$\            $$ |    $$ |    $$ |                    $$ |      \__|          
- $$$$$$\  $$\   $$\         $$ |  $$ | $$$$$$\ $$$$$$\ $$$$$$\   $$ | $$$$$$\   $$$$$$$\ $$$$$$$\  $$\  $$$$$$\  
-$$  __$$\ $$ |  $$ |$$$$$$\ $$$$$$$\ | \____$$\\\_$$  _|\_$$  _|  $$ |$$  __$$\ $$  _____|$$  __$$\ $$ |$$  __$$\ 
-$$ /  $$ |$$ |  $$ |\______|$$  __$$\  $$$$$$$ | $$ |    $$ |    $$ |$$$$$$$$ |\$$$$$$\  $$ |  $$ |$$ |$$ /  $$ |
-$$ |  $$ |$$ |  $$ |        $$ |  $$ |$$  __$$ | $$ |$$\ $$ |$$\ $$ |$$   ____| \____$$\ $$ |  $$ |$$ |$$ |  $$ |
-$$$$$$$  |\$$$$$$$ |        $$$$$$$  |\$$$$$$$ | \$$$$/  \$$$$  |$$ |\$$$$$$$\ $$$$$$$  |$$ |  $$ |$$ |$$$$$$$  |
-$$  ____/  \____$$ |        \_______/  \_______|  \____/  \____/ \__| \_______|\_______/ \__|  \__|\__|$$  ____/ 
-$$ |      $$\   $$ |                                                                                   $$ |      
-$$ |      \$$$$$$  |                                                                                   $$ |      
-\__|       \______/                                                                                    \__|      
+                            $$$$$$$\\             $$\\     $$\\     $$\\                     $$\\       $$\\           
+                            $$  __$$\\            $$ |    $$ |    $$ |                    $$ |      \\__|          
+ $$$$$$\\  $$\\   $$\\         $$ |  $$ | $$$$$$\\ $$$$$$\\ $$$$$$\\   $$ | $$$$$$\\   $$$$$$$\\ $$$$$$$\\  $$\\  $$$$$$\\  
+$$  __$$\\ $$ |  $$ |$$$$$$\\ $$$$$$$\\ | \\____$$\\\\_$$  _|\\_$$  _|  $$ |$$  __$$\\ $$  _____|$$  __$$\\ $$ |$$  __$$\\ 
+$$ /  $$ |$$ |  $$ |\\______|$$  __$$\\  $$$$$$$ | $$ |    $$ |    $$ |$$$$$$$$ |\\$$$$$$\\  $$ |  $$ |$$ |$$ /  $$ |
+$$ |  $$ |$$ |  $$ |        $$ |  $$ |$$  __$$ | $$ |$$\\ $$ |$$\\ $$ |$$   ____| \\____$$\\ $$ |  $$ |$$ |$$ |  $$ |
+$$$$$$$  |\\$$$$$$$ |        $$$$$$$  |\\$$$$$$$ | \\$$$$/  \\$$$$  |$$ |\\$$$$$$$\\ $$$$$$$  |$$ |  $$ |$$ |$$$$$$$  |
+$$  ____/  \\____$$ |        \\_______/  \\_______|  \\____/  \\____/ \\__| \\_______|\\_______/ \\__|  \\__|\\__|$$  ____/ 
+$$ |      $$\\   $$ |                                                                                   $$ |      
+$$ |      \\$$$$$$  |                                                                                   $$ |      
+\\__|       \\______/                                                                                    \\__|      
 
 beta version                                                                                        by Nick806
 """
@@ -114,8 +302,21 @@ Select a game mode [1-5]:
 4) Automatic and loop Bot gamepay with random bot ship positioning, but return the max and the min move position(you can choose the bot that will play)
 5) Step-by-step Bot gameplay with inputed ship positioning table (you can choose the bot that will play)
 
-Gamemode n°... """
-    return input(modes)
+"""
+    print (modes)
+
+    while True:
+        try:
+            mode = int(input("Gamemode n°... "))
+            if mode<=5 and mode>=1:
+                break
+            else:
+                print("Input is not valid - Enter a valid number")
+
+        except:
+            print("Input is not valid - Enter a number")
+
+    return mode
 
 def play_gamemode(gamemode):
 
@@ -338,6 +539,12 @@ def print_attack(table):
                 print(config_symbols.unknown, end=" ")
         print()
 
+def get_index_of_element_in_table(table, element):
+    for i1,x in enumerate(table):
+        for i2,y in enumerate(x):
+            if y == element:
+                return i1, i2
+
 def count_element_in_table(table, element):
     """
     Returns the number of times an element is contained in a table.
@@ -510,8 +717,26 @@ def max_possible_combination(table, ships):
 ################################################################################
 
 def gamemode1():
-    ship_positioning_table = get_function(random_bot_ship_placer,"place_ships")(ROWS, COLUMNS, SHIPS)
-    game(create_table(ROWS, COLUMNS, "O"), ship_positioning_table)
+    global ROWS, COLUMNS, SHIPS, default_symbols
+
+    ship_positioning_table = Ship_positioning_board(create_table(ROWS,COLUMNS,0))
+    ship_positioning_table.generate_random_board(SHIPS)
+
+    attack_table = Attack_board(create_table(ROWS,COLUMNS,default_symbols.unknown),SHIPS)
+
+    game = Game(attack_table, ship_positioning_table)
+
+    out = ""
+    while out != "won":
+        row, column = get_cell_input(game.attack_board.board, "Remaining ships: " + str(game.attack_board.remaining_ships))
+        out = game.attack(row, column)
+        print(f"Attacked at row:{row} and column:{column} - Move number: {game.moves}")
+        print(game.attack_board)
+        print(out)
+        print()
+    
+    print(f"Table: {game.ship_positioning_board.unicode}")
+
 
 def game(attack_table, ship_positioning_table):
     """
@@ -561,40 +786,29 @@ def game(attack_table, ship_positioning_table):
             return
 
 def gamemode2():
-    ship_positioning_table = get_function(random_bot_ship_placer,"place_ships")(ROWS, COLUMNS, SHIPS)
-
     bot_directory =os.path.join(bots_folder, select_a_bot(bots_folder, ""))
 
-    attack_table = create_table(ROWS, COLUMNS, "O")
+    ship_positioning_table = Ship_positioning_board(create_table(ROWS,COLUMNS,0))
+    ship_positioning_table.generate_random_board(SHIPS)
+
+    attack_table = Attack_board(create_table(ROWS,COLUMNS,default_symbols.unknown),SHIPS)
 
     bot_attack_function = get_function(bot_directory,"take_shot")
 
-    move = 0
-    while True:
-        print_attack(attack_table)
-        
-        move += 1
-        print("Moove number " + str(move))
+    game = Game(attack_table, ship_positioning_table)
 
-        remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, SHIPS)
-        print("Remaining ships: " + str(remaining_ships))
-
-        row, column = bot_attack_function(attack_table, remaining_ships)
-
-        print ("Row: " + str(row) + "   Column: " + str(column))
-
+    out = ""
+    while out != "won":
+        row, column = bot_attack_function(game.attack_board.board, game.attack_board.remaining_ships)
+        out = game.attack(row, column)
+        print(f"Attacked at row:{row} and column:{column} - Move number: {game.moves}")
+        print(game.attack_board)
+        print(out)
         input("Press ENTER to step")
+        print()
+    
+    print(f"Table: {game.ship_positioning_board.unicode}")
 
-        print(" ")
-
-
-        attack(attack_table, ship_positioning_table, row, column)
-        check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
-        
-        if check_win(attack_table, ship_positioning_table):
-            print_attack(attack_table)
-            print("You won! (" + str(move) + " moves)")
-            return
 
 def gamemode3():
     count_games = 0
@@ -698,44 +912,28 @@ def gamemode4():
             break
 
 def gamemode5():
-
-    ship_positioning_table = str_to_table(input("Enter the input string for the ship positioning table:"))
-
-    print_table(ship_positioning_table)
-    print("")
+    ship_positioning_table = Ship_positioning_board(str_to_table(input("Enter the input string for the ship positioning table:")))
+    print(ship_positioning_table)
+    print()
+    attack_table = Attack_board(create_table(ROWS,COLUMNS,default_symbols.unknown),SHIPS)
 
     bot_directory =os.path.join(bots_folder, select_a_bot(bots_folder, ""))
-
-    attack_table = create_table(ROWS, COLUMNS, "O")
-
     bot_attack_function = get_function(bot_directory,"take_shot")
 
-    move = 0
-    while True:
-        print_attack(attack_table)
-        
-        move += 1
-        print("Moove number " + str(move))
+    game = Game(attack_table, ship_positioning_table)
 
-        remaining_ships = get_remaining_ships(attack_table, ship_positioning_table, SHIPS)
-        print("Remaining ships: " + str(remaining_ships))
-
-        row, column = bot_attack_function(attack_table, remaining_ships)
-
-        print ("Row: " + str(row) + "   Column: " + str(column))
-
+    out = ""
+    while out != "won":
+        row, column = bot_attack_function(game.attack_board.board, game.attack_board.remaining_ships)
+        out = game.attack(row, column)
+        print(f"Attacked at row:{row} and column:{column} - Move number: {game.moves}")
+        print(game.attack_board)
+        print(out)
         input("Press ENTER to step")
+        print()
+    
+    print(f"Table: {game.ship_positioning_board.unicode}")
 
-        print(" ")
-
-
-        attack(attack_table, ship_positioning_table, row, column)
-        check_hit_and_sunk(attack_table, ship_positioning_table, row, column)
-        
-        if check_win(attack_table, ship_positioning_table):
-            print_attack(attack_table)
-            print("You won! (" + str(move) + " moves)")
-            return
 
 #TODO Write this in english
         
@@ -871,8 +1069,26 @@ def add_line_to_file(text, full_path):
 #   MAIN
 ################################################################################
 
+"""
+attack_board = Attack_board(create_table(ROWS, COLUMNS, "O"),[5])
+
+print_table(attack_board.board)
+print(attack_board.rows)
+print(attack_board.columns)
+print(attack_board)
+retrive_config()
+print(attack_board)
+
+ship_positioning_board = Ship_positioning_board(create_table(ROWS, COLUMNS, 0))
+print(ship_positioning_board)
+ship_positioning_board.board[3][4] = 3
+print(ship_positioning_board)
+ship_positioning_board.generate_random_board(SHIPS)
+print(ship_positioning_board)"""
+
 if __name__ == "__main__":
         
+    
     
     retrive_config()
 
@@ -889,6 +1105,8 @@ if __name__ == "__main__":
         pygame.quit()
 
         input("Pres ENTER to close....")
+
+        
 
     
 
